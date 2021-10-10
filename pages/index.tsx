@@ -1,6 +1,10 @@
+import { faTelegramPlane, faTwitter } from "@fortawesome/free-brands-svg-icons";
+import { faLink } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import commaNumber from "comma-number";
 import Head from "next/head";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
+
 export default function Home() {
   // ------------ DASHBOARD STATES ------------- //
 
@@ -190,6 +194,26 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
+      <div className="h-10 mt-8 flex text-2xl text-blue-800 w-full justify-center space-x-5">
+        <a href="https://twitter.com/nanoshibainubsc" target="_blank">
+          <FontAwesomeIcon
+            icon={faTwitter}
+            className="h-10 hover:brightness-150 hover:saturate-200"
+          />
+        </a>
+        <a href="https://t.me/NanoShibaInuCoin" target="_blank">
+          <FontAwesomeIcon
+            icon={faTelegramPlane}
+            className="h-10 hover:brightness-150 hover:saturate-200"
+          />
+        </a>
+        <a href="https://www.nanoshibainu.io/" target="_blank">
+          <FontAwesomeIcon
+            icon={faLink}
+            className="h-8 ml-2 mt-1 hover:brightness-150 hover:saturate-200"
+          />
+        </a>
       </div>
     </div>
   );
