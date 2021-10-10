@@ -68,7 +68,7 @@ export default function Home() {
         </div>
       </div>
       <Head>
-        <title>NanoShiba BSC Dashboard</title>
+        <title>DASHBOARD | NANOSHIBAINU</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
 
         <link
