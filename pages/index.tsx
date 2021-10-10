@@ -1,7 +1,12 @@
 import commaNumber from "comma-number";
 import Head from "next/head";
-import { useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 export default function Home() {
+  // ------------ DASHBOARD STATES ------------- //
+
+  const [isLoading, setIsLoading] = useState(true);
+  const bscAddress = useRef(undefined);
+
   const [price, setPrice] = useState(0.0000012345658954123);
   const [marketCap, setMarketCap] = useState("123321512");
   const [circulatingSupply, setCirculatingSupply] = useState(123321513812);
@@ -13,11 +18,51 @@ export default function Home() {
   const [totalRewardsDistributed, settotalRewardsDistributed] =
     useState(321311233223);
   const [yourRewardsOverTime, setYourRewardsOverTime] = useState(512567989);
+
+  // ------------ FUNCITONS ------------- //
   function getPrice(amount: number) {
     return (amount * price).toFixed(2);
   }
+
+  // ------------ ON LOAD ------------- //
+
+  useEffect(() => {
+    const myTimeout = setTimeout(() => setIsLoading(false), 3000);
+    return () => {
+      clearTimeout(myTimeout);
+    };
+  }, []);
+
+  // ------------ ON CLICK ------------- //
+  function handleBscAddress(ref: MutableRefObject<any>) {
+    const address = ref.current.value;
+    address.length
+      ? alert("Current BSC Address:\n" + address)
+      : alert("Address is empty.");
+  }
+
   return (
-    <div className="min-h-screen bg-accentblue py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80">
+    <div
+      className={
+        (isLoading ? "overflow-hidden" : "overflow-auto") +
+        " min-h-screen bg-lightbg py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80"
+      }
+    >
+      <div
+        className={
+          (isLoading ? "flex" : "hidden") +
+          " " +
+          "absolute h-screen w-full bg-gradient-to-br from-lightbg to-lighterbg flex-col justify-center items-center z-30 left-0 top-0"
+        }
+      >
+        <img
+          src="/loading.svg"
+          alt="Loading SVG for NanoShiba token dashboard on BSC"
+        />
+        <div className="text-2xl text-dark font-semibold font-title">
+          Connecting to blockchain...
+        </div>
+      </div>
       <Head>
         <title>aaa</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -57,11 +102,15 @@ export default function Home() {
         <img src="/logo.jpg" alt="NanoShibaInu Logo" className="w-64" />
         <div className="flex items-center max-w-xl w-full shadow-md mt-5 border-red-500">
           <input
+            ref={bscAddress}
             type="text"
             className="w-full bg-white rounded-l-md  h-10 text-black px-5 outline-none"
             placeholder="Please paste your BSC address"
           />
-          <div className="h-10 flex items-center justify-center bg-accentred rounded-r-md px-3 font-semibold font-title pt-1 text-dark hover:brightness-125 select-none cursor-pointer">
+          <div
+            onClick={() => handleBscAddress(bscAddress)}
+            className="h-10 flex items-center justify-center bg-accentred rounded-r-md px-3 font-semibold font-title pt-1 text-dark hover:brightness-125 select-none cursor-pointer"
+          >
             Go
           </div>
         </div>
