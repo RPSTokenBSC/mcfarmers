@@ -61,14 +61,14 @@ export default function Home() {
         className={
           (isLoading ? "flex" : "hidden") +
           " " +
-          "absolute h-screen w-full bg-gradient-to-br from-lightbg to-lighterbg flex-col justify-center items-center z-30 left-0 top-0"
+          "absolute h-screen w-full bg-gradient-to-br from-main to-darker flex-col justify-center items-center z-30 left-0 top-0 "
         }
       >
         <img
           src="/loading.svg"
           alt="Loading SVG for NanoShiba token dashboard on BSC"
         />
-        <div className="text-2xl text-dark font-semibold font-title">
+        <div className="text-2xl text-white font-semibold font-title">
           Connecting to blockchain...
         </div>
       </div>
