@@ -6,6 +6,10 @@ import Head from "next/head";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 
 export default function Home() {
+  // prettier-ignore
+  const accentGradient = /*<a className="*/ 'bg-gradient-to-br from-lightbg to-lighterbg'; /* "> */
+  //const accentGradient = "";
+  /*<a className="*/ ("bg-gradient-to-br from-lightbg to-lighterbg"); /* "> */
   // ------------ DASHBOARD STATES ------------- //
 
   const [isLoading, setIsLoading] = useState(true);
@@ -49,8 +53,9 @@ export default function Home() {
     <div
       className={
         (isLoading ? "overflow-hidden" : "overflow-auto") +
-        " min-h-screen bg-lightbg py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80"
+        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80"
       }
+      style={{ backgroundImage: 'url("/assets/genericblue.png")' }}
     >
       <div
         className={
@@ -68,7 +73,7 @@ export default function Home() {
         </div>
       </div>
       <Head>
-        <title>DASHBOARD | NANOSHIBAINU</title>
+        <title>Dashboard | Rock, Paper, Scissors Token on BSC</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
 
         <link
@@ -102,113 +107,117 @@ export default function Home() {
       `}
         </style>
       </Head>
-      <div className="h-full w-full bg-main rounded-xl shadow-lg px-5 py-10 flex flex-col items-center focus:border-red-500">
-        <img src="/logo.jpg" alt="NanoShibaInu Logo" className="w-64" />
+      <div className="h-full w-full bg-darker rounded-xl shadow-lg px-5 py-10 flex flex-col items-center focus:border-red-500">
+        <img
+          src="/logo.png"
+          alt="Rock Paper Scissors Token (RPST) Logo"
+          className="w-64"
+        />
         <div className="flex items-center max-w-xl w-full shadow-md mt-5 border-red-500">
           <input
             ref={bscAddress}
             type="text"
-            className="w-full bg-white rounded-l-md  h-10 text-black px-5 outline-none"
+            className="w-full bg-main focus:brightness-125 hover:brightness-110 rounded-l-md text-white h-10  px-5 outline-none"
             placeholder="Please paste your BSC address"
           />
           <div
             onClick={() => handleBscAddress(bscAddress)}
-            className="h-10 flex items-center justify-center bg-accentred rounded-r-md px-3 font-semibold font-title pt-1 text-dark hover:brightness-125 select-none cursor-pointer"
+            className="h-10 flex items-center justify-center bg-gradient-to-br from-accentlight to-accentdark rounded-r-md px-3 font-semibold font-title pt-1 text-main hover:contrast-150 select-none cursor-pointer"
           >
             Go
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-10 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-semibold w-full">
-          <div className="bg-lightbg brightness-95 saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
-            <span className="text-gray-600 font-normal">Price:&nbsp;</span>$
+        <div className="flex flex-col lg:flex-row mt-10 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-semibold w-full text-white">
+          <div className="bg-main saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
+            <span className="text-gray-300 font-normal">Price:&nbsp;</span>$
             {commaNumber(price)}
           </div>
-          <div className="bg-lightbg brightness-95 saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
-            <span className="text-gray-600 font-normal">Market Cap:&nbsp;</span>
+          <div className="bg-main saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
+            <span className="text-gray-300 font-normal">Market Cap:&nbsp;</span>
             ${commaNumber(marketCap)}
           </div>
-          <div className="bg-lightbg brightness-95 saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
-            <span className="text-gray-600 font-normal">
+          <div className="bg-main saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
+            <span className="text-gray-300 font-normal">
               Circulating Supply:&nbsp;
             </span>
 
-            <span className="text-blue-700">
-              {commaNumber(circulatingSupply)} NASHI
+            <span className="text-accentlight">
+              {commaNumber(circulatingSupply)} RPST
             </span>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-semibold w-full text-green-600 ">
-          <div className="bg-lighterbg saturate-150 brightness-125 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-600 font-medium">Unclaimed rewards:</div>{" "}
-            <div className="font-bold text-blue-700">
-              {commaNumber(unclaimedRewards)} NASHI
+        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-semibold w-full text-dollarsDark ">
+          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-400 font-medium">Unclaimed rewards:</div>{" "}
+            <div className="font-bold text-accentdark">
+              {commaNumber(unclaimedRewards)} RPST
             </div>
             <div className="font-bold">
               ${commaNumber(getPrice(unclaimedRewards))}
             </div>
           </div>
-          <div className="bg-lighterbg saturate-150  brightness-125 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-600 font-medium">Balance:</div>
-            <div className="font-bold text-blue-700">
-              {commaNumber(balance)} NASHI
+          <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-400 font-medium">Balance:</div>
+            <div className="font-bold text-accentdark">
+              {commaNumber(balance)} RPST
             </div>
             <div className="font-bold">${commaNumber(getPrice(balance))}</div>
           </div>
-          <div className="bg-lighterbg saturate-150 rounded-md px-5 brightness-125 py-3 w-full shadow-md">
-            <div className="text-gray-600 font-medium">
+          <div className="bg-main saturate-150 brightness-150  rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-400 font-medium">
               Total Rewards Distributed:
             </div>{" "}
             <div className="font-bold">
-              <div className="text-blue-700">
+              <div className="text-accentdark">
                 {commaNumber(totalRewardsDistributed)}
               </div>
               ${commaNumber(getPrice(totalRewardsDistributed))}
             </div>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-semibold w-full text-green-600 ">
-          <div className="bg-lighterbg saturate-150 brightness-125 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-600 font-medium">
+        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-bold w-full text-dollarsDark ">
+          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-400 font-medium">
               Your rewards over time:
             </div>{" "}
             <div className="font-bold">
-              <div className="text-blue-700">
-                {commaNumber(yourRewardsOverTime)} NASHI
+              <div className="text-accentdark">
+                {commaNumber(yourRewardsOverTime)} RPST
               </div>
               ${commaNumber(getPrice(yourRewardsOverTime))}
             </div>
           </div>
-          <div className="bg-lighterbg saturate-150  brightness-125 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-600 font-medium">Rewards per cycle:</div>
-            <div className="text-blue-700 font-bold">
-              {commaNumber(rewardsPerCycle)} NASHI
+          <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-400 font-medium">Rewards per cycle:</div>
+            <div className="text-accentdark font-bold">
+              {commaNumber(rewardsPerCycle)} RPST
             </div>
             ${commaNumber(getPrice(rewardsPerCycle))}
           </div>
-          <div className="bg-lighterbg saturate-150 rounded-md px-5 brightness-125 py-3 w-full shadow-md">
-            <div className="text-gray-600 font-medium">
+          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-400 font-medium">
               Answer to the ultimate question:
             </div>{" "}
             <div className="font-bold">
-              <div className="text-blue-700">42</div>
+              <div className="text-accentdark">42</div>
             </div>
           </div>
         </div>
       </div>
-      <div className="h-10 mt-8 flex text-2xl text-blue-800 w-full justify-center space-x-5">
-        <a href="https://twitter.com/nanoshibainubsc" target="_blank">
+      <div className="h-10 mt-8 flex text-2xl text-accentdark w-full justify-center space-x-5">
+        <a href="https://twitter.com/RPS_Token" target="_blank">
           <FontAwesomeIcon
             icon={faTwitter}
             className="h-10 hover:brightness-150 hover:saturate-200"
           />
         </a>
-        <a href="https://t.me/NanoShibaInuCoin" target="_blank">
+        <a href="https://t.me/RPSTOfficial" target="_blank">
           <FontAwesomeIcon
             icon={faTelegramPlane}
             className="h-10 hover:brightness-150 hover:saturate-200"
           />
         </a>
-        <a href="https://www.nanoshibainu.io/" target="_blank">
+        <a href="https://www.rpstokenbsc.com/" target="_blank">
           <FontAwesomeIcon
             icon={faLink}
             className="h-8 ml-2 mt-1 hover:brightness-150 hover:saturate-200"
