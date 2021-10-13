@@ -35,7 +35,15 @@ export default function Home() {
   // ------------ ON LOAD ------------- //
 
   useEffect(() => {
-    const myTimeout = setTimeout(() => setIsLoading(false), 3000);
+    const address = window.localStorage.getItem("preferredAddress");
+    console.log(address);
+    if (
+      (typeof address === "string" && address?.length && address !== "null") ||
+      (address !== "undefined" && address?.startsWith("0x"))
+    ) {
+      bscAddress.current.value = address;
+    }
+    const myTimeout = setTimeout(() => setIsLoading(false), 2000);
     return () => {
       clearTimeout(myTimeout);
     };
@@ -43,25 +51,32 @@ export default function Home() {
 
   // ------------ ON CLICK ------------- //
   function handleBscAddress(ref: MutableRefObject<any>) {
-    const address = ref.current.value;
-    address.length
-      ? alert("Current BSC Address:\n" + address)
-      : alert("Address is empty.");
+    console.log({ value: ref.current?.value, type: typeof ref.current?.value });
+    ref.current?.value?.length && ref?.current?.value?.startsWith("0x")
+      ? (alert("Current BSC Address:\n" + ref.current?.value),
+        window.localStorage.setItem("preferredAddress", ref.current?.value))
+      : alert("Address is empty or doesn't start with 0x.");
+  }
+
+  function handleClaimDividend() {
+    alert("Claiming dividend.");
   }
 
   return (
     <div
       className={
-        (isLoading ? "overflow-hidden" : "overflow-auto") +
-        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80"
+        (isLoading
+          ? "overflow-hidden max-h-screen"
+          : "overflow-auto max-h-full") +
+        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80 bg-mainbg"
       }
-      style={{ backgroundImage: 'url("/assets/genericblue.png")' }}
+      // style={{ backgroundImage: 'url("/assets/genericblue.png")' }}
     >
       <div
         className={
           (isLoading ? "flex" : "hidden") +
           " " +
-          "absolute h-screen w-full bg-gradient-to-br from-main to-darker flex-col justify-center items-center z-30 left-0 top-0 "
+          "absolute h-screen w-full bg-gradient-to-br from-mainbg to-darker flex-col justify-center items-center z-30 left-0 top-0 "
         }
       >
         <img
@@ -101,13 +116,13 @@ export default function Home() {
         <style>
           {`
         @import
-        url(https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Open+Sans&display=swap);
+        url(https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Open+Sans:wght@400;500;700&display=swap);
         /*html, body, #__next { min-height: 100%; height: 100% }*/
         
       `}
         </style>
       </Head>
-      <div className="h-full w-full bg-darker rounded-xl shadow-lg px-5 py-10 flex flex-col items-center focus:border-red-500">
+      <div className="h-full w-full bg-aside rounded-xl shadow-lg px-5 py-10 flex flex-col items-center focus:border-red-500">
         <img
           src="/logo.png"
           alt="Rock Paper Scissors Token (RPST) Logo"
@@ -117,7 +132,10 @@ export default function Home() {
           <input
             ref={bscAddress}
             type="text"
-            className="w-full bg-main focus:brightness-125 hover:brightness-110 rounded-l-md text-white h-10  px-5 outline-none"
+            className={
+              "w-full bg-elevatedbg border-l border-t border-b border-gray-700 brightness-75 " +
+              "focus:brightness-125 hover:brightness-110 rounded-l-md text-white h-10  px-5 outline-none"
+            }
             placeholder="Please paste your BSC address"
           />
           <div
@@ -127,17 +145,17 @@ export default function Home() {
             Go
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-10 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-semibold w-full text-white">
-          <div className="bg-main saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
-            <span className="text-gray-300 font-normal">Price:&nbsp;</span>$
+        <div className="flex flex-col lg:flex-row mt-10 space-x-0 space-y-1 lg:space-y-0 lg:space-x-5 font-semibold w-full text-white">
+          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium">
+            <span className="text-gray-300 font-medium">Price:&nbsp;</span>$
             {commaNumber(price)}
           </div>
-          <div className="bg-main saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
-            <span className="text-gray-300 font-normal">Market Cap:&nbsp;</span>
+          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium">
+            <span className="text-gray-300 font-medium">Market Cap:&nbsp;</span>
             ${commaNumber(marketCap)}
           </div>
-          <div className="bg-main saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
-            <span className="text-gray-300 font-normal">
+          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium">
+            <span className="text-gray-300 font-medium">
               Circulating Supply:&nbsp;
             </span>
 
@@ -146,56 +164,60 @@ export default function Home() {
             </span>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-semibold w-full text-dollarsDark ">
-          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">Unclaimed rewards:</div>{" "}
+        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full text-dollarsDark font-medium ">
+          <div className="bg-elevatedbg saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-300 font-normal">Unclaimed rewards:</div>{" "}
             <div className="font-bold text-accentdark">
               {commaNumber(unclaimedRewards)} RPST
             </div>
-            <div className="font-bold">
-              ${commaNumber(getPrice(unclaimedRewards))}
+            <div className="">${commaNumber(getPrice(unclaimedRewards))}</div>
+            <div
+              onClick={handleClaimDividend}
+              className="w-full py-1.5 mt-3 font-bold text-lg bg-accentdark brightness-75 hover:brightness-100 select-none hover:cursor-pointer active:saturate-150 text-mainbg flex items-center justify-center rounded-md font-title"
+            >
+              Claim dividend
             </div>
           </div>
-          <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">Balance:</div>
+          <div className="bg-elevatedbg saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-300 font-normal">Balance:</div>
             <div className="font-bold text-accentdark">
               {commaNumber(balance)} RPST
             </div>
-            <div className="font-bold">${commaNumber(getPrice(balance))}</div>
+            <div className="">${commaNumber(getPrice(balance))}</div>
           </div>
-          <div className="bg-main saturate-150 brightness-150  rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">
+          <div className="bg-elevatedbg saturate-150 brightness-150  rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-300 font-normal">
               Total Rewards Distributed:
             </div>{" "}
-            <div className="font-bold">
-              <div className="text-accentdark">
-                {commaNumber(totalRewardsDistributed)}
+            <div className="">
+              <div className="text-accentdark font-bold">
+                {commaNumber(totalRewardsDistributed)} RPST
               </div>
               ${commaNumber(getPrice(totalRewardsDistributed))}
             </div>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-bold w-full text-dollarsDark ">
-          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">
+        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full text-dollarsDark font-medium ">
+          <div className="bg-elevatedbg saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-300 font-normal">
               Your rewards over time:
             </div>{" "}
-            <div className="font-bold">
-              <div className="text-accentdark">
+            <div className="">
+              <div className="text-accentdark font-bold">
                 {commaNumber(yourRewardsOverTime)} RPST
               </div>
               ${commaNumber(getPrice(yourRewardsOverTime))}
             </div>
           </div>
-          <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">Rewards per cycle:</div>
+          <div className="bg-elevatedbg saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md font-medium">
+            <div className="text-gray-300 font-normal">Rewards per cycle:</div>
             <div className="text-accentdark font-bold">
               {commaNumber(rewardsPerCycle)} RPST
             </div>
             ${commaNumber(getPrice(rewardsPerCycle))}
           </div>
-          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">
+          <div className="bg-elevatedbg saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-300 font-normal">
               Answer to the ultimate question:
             </div>{" "}
             <div className="font-bold">
