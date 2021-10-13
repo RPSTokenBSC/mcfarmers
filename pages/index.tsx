@@ -51,11 +51,15 @@ export default function Home() {
 
   // ------------ ON CLICK ------------- //
   function handleBscAddress(ref: MutableRefObject<any>) {
+    setIsLoading(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => setIsLoading(false), 1000);
     console.log({ value: ref.current?.value, type: typeof ref.current?.value });
-    ref.current?.value?.length && ref?.current?.value?.startsWith("0x")
-      ? (alert("Current BSC Address:\n" + ref.current?.value),
-        window.localStorage.setItem("preferredAddress", ref.current?.value))
-      : alert("Address is empty or doesn't start with 0x.");
+    ref.current?.value?.length &&
+      ref?.current?.value?.startsWith("0x") &&
+      //? (alert("Current BSC Address:\n" + ref.current?.value),
+      window.localStorage.setItem("preferredAddress", ref.current?.value); //)
+    //: alert("Address is empty or doesn't start with 0x.");
   }
 
   function handleClaimDividend() {
