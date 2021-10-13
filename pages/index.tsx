@@ -34,12 +34,22 @@ export default function Home() {
   // function getPrice(amount: number) {
   //   return (amount * price).toFixed(2);
   // }
+  function isAddress(address: string): boolean{
+    try {
+      web3Instance.utils.toChecksumAddress(address);
+      return web3Instance.utils.isAddress(address);
+    } catch {
+      return false;
+    }
+  }
 
   // ------------ ON LOAD ------------- //
 
   useEffect(() => {
     async function loadData(){
-      const pricingData = await retrievePricingData(null);
+      const address = window.localStorage.getItem("preferredAddress");
+
+      const pricingData = await retrievePricingData(isAddress(address)? address: null);
       setIsLoading(false);
       setPrice(pricingData.tokenPrice);
       setCirculatingSupply(pricingData.circulatingSupply);
@@ -50,6 +60,10 @@ export default function Home() {
       setTotalRewardsDistributed(pricingData.totalRewards);
       setBuybackBalance(pricingData.buybackBalance);
       setBuyBackBalanceInUsd(pricingData.buybackBalanceInUsd);
+      setBalance(pricingData.holdersBalance);
+      setBalanceInUsd(pricingData.holdersBalanceInUsd);
+      setBuyBackBalanceInUsd(pricingData.holdersBalanceInUsd);
+      setUnclaimedRewards(pricingData.unpaidRewards);
     }
     
     loadData();
@@ -58,19 +72,14 @@ export default function Home() {
 
   // ------------ ON CLICK ------------- //
   async function handleBscAddress(ref: MutableRefObject<any>) {
-    let address;
-    try {
-      address = web3Instance.utils.toChecksumAddress(ref.current.value);
-    } catch {
-      alert("Invalid address. Please try again");
-      return;
-    }
-    const isAddress = web3Instance.utils.isAddress(address);
-    if(!isAddress) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    const address = ref.current.value;
+    if(!isAddress(address)) {
         alert("Invalid address. Please try again.");
         return;
     }
     setIsLoading(true);
+    window.localStorage.setItem("preferredAddress", ref.current?.value);
     
     const pricingData = await retrievePricingData(address);
     setIsLoading(false);
@@ -87,19 +96,25 @@ export default function Home() {
     return;
   }
 
+  function handleClaimDividend() {
+    alert('This feature will be added shortly');
+  }
+
   return (
     <div
       className={
-        (isLoading ? "overflow-hidden" : "overflow-auto") +
-        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80"
+        (isLoading
+          ? "overflow-hidden max-h-screen"
+          : "overflow-auto max-h-full") +
+        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80 bg-mainbg"
       }
-      style={{ backgroundImage: 'url("/assets/genericblue.png")' }}
+      // style={{ backgroundImage: 'url("/assets/genericblue.png")' }}
     >
       <div
         className={
           (isLoading ? "flex" : "hidden") +
           " " +
-          "absolute h-screen w-full bg-gradient-to-br from-main to-darker flex-col justify-center items-center z-30 left-0 top-0 "
+          "absolute h-screen w-full bg-gradient-to-br from-mainbg to-darker flex-col justify-center items-center z-30 left-0 top-0 "
         }
       >
         <img
@@ -139,13 +154,13 @@ export default function Home() {
         <style>
           {`
         @import
-        url(https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Open+Sans&display=swap);
+        url(https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Open+Sans:wght@400;500;700&display=swap);
         /*html, body, #__next { min-height: 100%; height: 100% }*/
         
       `}
         </style>
       </Head>
-      <div className="h-full w-full bg-darker rounded-xl shadow-lg px-5 py-10 flex flex-col items-center focus:border-red-500">
+      <div className="h-full w-full bg-aside rounded-xl shadow-lg px-5 py-10 flex flex-col items-center focus:border-red-500">
         <img
           src="/logo.png"
           alt="Rock Paper Scissors Token (RPST) Logo"
@@ -155,7 +170,10 @@ export default function Home() {
           <input
             ref={bscAddress}
             type="text"
-            className="w-full bg-main focus:brightness-125 hover:brightness-110 rounded-l-md text-white h-10  px-5 outline-none"
+            className={
+              "w-full bg-elevatedbg border-l border-t border-b border-gray-700 brightness-75 " +
+              "focus:brightness-125 hover:brightness-110 rounded-l-md text-white h-10  px-5 outline-none"
+            }
             placeholder="Please paste your BSC address"
           />
           <div
@@ -165,17 +183,17 @@ export default function Home() {
             Go
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-10 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-semibold w-full text-white">
-          <div className="bg-main saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
-            <span className="text-gray-300 font-normal">Price:&nbsp;</span>$
+        <div className="flex flex-col lg:flex-row mt-10 space-x-0 space-y-1 lg:space-y-0 lg:space-x-5 font-semibold w-full text-white">
+          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium">
+            <span className="text-gray-300 font-medium">Price:&nbsp;</span>$
             {commaNumber(price)}
           </div>
-          <div className="bg-main saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
-            <span className="text-gray-300 font-normal">Market Cap:&nbsp;</span>
+          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium">
+            <span className="text-gray-300 font-medium">Market Cap:&nbsp;</span>
             ${commaNumber(marketCap)}
           </div>
-          <div className="bg-main saturate-150 rounded-md px-5 py-3 w-full shadow-md flex flex-wrap">
-            <span className="text-gray-300 font-normal">
+          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium">
+            <span className="text-gray-300 font-medium">
               Circulating Supply:&nbsp;
             </span>
 
@@ -184,24 +202,29 @@ export default function Home() {
             </span>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-semibold w-full text-dollarsDark ">
-          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">Unclaimed rewards:</div>{" "}
+        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full text-dollarsDark font-medium ">
+          <div className="bg-elevatedbg saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-300 font-normal">Unclaimed rewards:</div>{" "}
             <div className="font-bold text-accentdark">
               {commaNumber(unclaimedRewards)} BUSD
             </div>
-            <div className="font-bold">
+            <div className=""></div>
+            <div
+              onClick={handleClaimDividend}
+              className="w-full py-1.5 mt-3 font-bold text-lg bg-accentdark brightness-75 hover:brightness-100 select-none hover:cursor-pointer active:saturate-150 text-mainbg flex items-center justify-center rounded-md font-title"
+            >
+              Claim dividend
             </div>
           </div>
-          <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">Balance:</div>
+          <div className="bg-elevatedbg saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-300 font-normal">Balance:</div>
             <div className="font-bold text-accentdark">
               {commaNumber(balance)} RPST
             </div>
             <div className="font-bold">${commaNumber(balanceInUsd)}</div>
           </div>
-          <div className="bg-main saturate-150 brightness-150  rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">
+          <div className="bg-elevatedbg saturate-150 brightness-150  rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-300 font-normal">
               Total Rewards Distributed:
             </div>{" "}
             <div className="font-bold">
