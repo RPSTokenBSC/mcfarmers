@@ -2,13 +2,16 @@ import axios from "axios";
 import {
     bnbDecimals,
     dividendTrackerContract,
+    frontendWalletAddress,
+    gameContract,
     LpTokenContract,
     PricingData,
     rewardsDecimals,
-    rewardsSymbol,
+    tokenAddress,
     tokenContract,
     TokenToUsd,
-    WBNB
+    WBNB,
+    web3Instance
 } from "./config";
 
 export async function retrievePricingData(userAddress: null | string): Promise<PricingData> {
@@ -26,30 +29,49 @@ export async function retrievePricingData(userAddress: null | string): Promise<P
     const bnbIdx = token0 == WBNB? 0: 1;
     const bnbPriceResponse = (await axios.get<TokenToUsd>('https://api.binance.com/api/v3/ticker/price?symbol=BNBBUSD'));
     const bnbPriceInUsd = parseFloat(bnbPriceResponse.data.price);
-    const rewardsPriceResponse = (await axios.get<TokenToUsd>('https://api.binance.com/api/v3/ticker/price?symbol=' + rewardsSymbol + 'BUSD'));
-    const rewardsInUsd = parseFloat(rewardsPriceResponse.data.price);
     const reserves = await LpTokenContract.methods.getReserves().call();
     const tokenLiquidity = reserves[tokenIdx] / 10**tokenDecimals;
     const bnbLiquidity = reserves[bnbIdx] / 10**bnbDecimals;
     const tokenPrice = ((bnbLiquidity / tokenLiquidity) * bnbPriceInUsd).toFixed(14);
     const circulatingSupply = (await tokenContract.methods.getCirculatingSupply().call()) / 10**tokenDecimals;
     const totalRewards = (await dividendTrackerContract.methods.totalDividends().call()) / 10**rewardsDecimals;
-    const totalFees = await tokenContract.methods.totalFee().call();
-    const maxTx = (await tokenContract.methods.checkMaxTxAmount().call()) / 10**tokenDecimals;
-    const maxWallet = (await tokenContract.methods.checkMaxWalletToken().call()) / 10**tokenDecimals;
+    const maxTx = (await tokenContract.methods._maxTxAmount().call()) / 10**tokenDecimals;
+    const winVolume = web3Instance.utils.toBN(
+        await gameContract.methods.getWinVolume().call({
+            from: frontendWalletAddress
+        })
+    );
+    const lossVolume = web3Instance.utils.toBN(
+        await gameContract.methods.getLossVolume().call({
+            from: frontendWalletAddress
+        })
+    );
+    const tieVolume = web3Instance.utils.toBN(
+        await gameContract.methods.getTieVolume().call({
+            from: frontendWalletAddress
+        })
+    );
+    const bnbDivisor = web3Instance.utils.toBN(10**16);
+    const totalBettingVolume = ((winVolume.add(lossVolume).add(tieVolume)).div(
+        bnbDivisor
+    )).toNumber() / 100;
+    const buybackBalance = web3Instance.utils.toBN(await web3Instance.eth.getBalance(tokenAddress)).div(
+        bnbDivisor
+    ).toNumber() / 100;
+
     const pricingData = {
         tokenPrice: tokenPrice, 
         marketCap:  (circulatingSupply * parseFloat(tokenPrice)).toFixed(0), 
         circulatingSupply: circulatingSupply.toFixed(0), 
         unpaidRewards: unpaidRewards? unpaidRewards.toFixed(0): '0', 
-        unpaidRewardsInUsd: unpaidRewards? (unpaidRewards * rewardsInUsd).toFixed(2): '0', 
         holdersBalance: holdersBalance? holdersBalance.toFixed(0): '0', 
         holdersBalanceInUsd: holdersBalance? (holdersBalance * parseFloat(tokenPrice)).toFixed(2): '0',  
         totalRewards: totalRewards.toFixed(0), 
-        totalRewardsInUsd: (totalRewards * rewardsInUsd).toFixed(2), 
-        totalFees: totalFees, 
         maxTx: maxTx.toFixed(0), 
-        maxWallet: maxWallet.toFixed(0), 
+        totalBettingVolume: totalBettingVolume, 
+        totalBettingVolumeInUsd: (totalBettingVolume * bnbPriceInUsd).toFixed(2), 
+        buybackBalance: buybackBalance, 
+        buybackBalanceInUsd: (buybackBalance * bnbPriceInUsd).toFixed(2)
     };  
     return pricingData;
 }

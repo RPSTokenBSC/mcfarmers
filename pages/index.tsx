@@ -21,14 +21,14 @@ export default function Home() {
   const [marketCap, setMarketCap] = useState('0');
   const [circulatingSupply, setCirculatingSupply] = useState('0');
   const [unclaimedRewards, setUnclaimedRewards] = useState('0');
-  const [unclaimedRewardsInUsd, setUnclaimedRewardsInUsd] = useState('0');
   const [maxTx, setMaxTx] = useState('0');
-  const [maxWallet, setMaxWallet] = useState('0')
   const [balance, setBalance] = useState('0');
   const [balanceInUsd, setBalanceInUsd] = useState('0');
-  const [totalFees, setTotalFees] = useState(18);
+  const [totalBettingVolume, setTotalBettingVolume] = useState(0);
+  const [totalBettingVolumeInUsd, setTotalBettingVolumeInUsd] = useState('0');
   const [totalRewardsDistributed, setTotalRewardsDistributed] = useState('0');
-  const [totalRewardsInUsd, setTotalRewardsInUsd] = useState('0');
+  const [buybackBalance, setBuybackBalance] = useState(0);
+  const [buyBackBalanceInUsd, setBuyBackBalanceInUsd] = useState('0');
 
   // ------------ FUNCTIONS ------------- //
   // function getPrice(amount: number) {
@@ -38,29 +38,26 @@ export default function Home() {
   // ------------ ON LOAD ------------- //
 
   useEffect(() => {
-    const myTimeout = setTimeout(() => setIsLoading(false), 3000);
     async function loadData(){
       const pricingData = await retrievePricingData(null);
+      setIsLoading(false);
       setPrice(pricingData.tokenPrice);
       setCirculatingSupply(pricingData.circulatingSupply);
       setMarketCap(pricingData.marketCap);
-      setTotalFees(pricingData.totalFees);
+      setTotalBettingVolume(pricingData.totalBettingVolume);
+      setTotalBettingVolumeInUsd(pricingData.totalBettingVolumeInUsd);
       setMaxTx(pricingData.maxTx);
-      setMaxWallet(pricingData.maxWallet);
       setTotalRewardsDistributed(pricingData.totalRewards);
-      setTotalRewardsInUsd(pricingData.totalRewardsInUsd);
+      setBuybackBalance(pricingData.buybackBalance);
+      setBuyBackBalanceInUsd(pricingData.buybackBalanceInUsd);
     }
     
     loadData();
-    return () => {
-      clearTimeout(myTimeout);
-    };
+    return;
   }, [isLoading]);
 
   // ------------ ON CLICK ------------- //
   async function handleBscAddress(ref: MutableRefObject<any>) {
-    setIsLoading(true);
-    const myTimeout = setTimeout(() => setIsLoading(false), 5000);
     let address;
     try {
       address = web3Instance.utils.toChecksumAddress(ref.current.value);
@@ -73,20 +70,20 @@ export default function Home() {
         alert("Invalid address. Please try again.");
         return;
     }
+    setIsLoading(true);
     
     const pricingData = await retrievePricingData(address);
+    setIsLoading(false);
     setPrice(pricingData.tokenPrice);
     setCirculatingSupply(pricingData.circulatingSupply);
     setMarketCap(pricingData.marketCap);
-    setTotalFees(pricingData.totalFees);
+    setTotalBettingVolume(pricingData.totalBettingVolume);
+    setTotalBettingVolumeInUsd(pricingData.totalBettingVolumeInUsd)
     setMaxTx(pricingData.maxTx);
-    setMaxWallet(pricingData.maxWallet);
     setTotalRewardsDistributed(pricingData.totalRewards);
-    setTotalRewardsInUsd(pricingData.totalRewardsInUsd);
     setBalance(pricingData.holdersBalance);
     setBalanceInUsd(pricingData.holdersBalanceInUsd);
     setUnclaimedRewards(pricingData.unpaidRewards);
-    setUnclaimedRewardsInUsd(pricingData.unpaidRewardsInUsd);
     return;
   }
 
@@ -191,10 +188,9 @@ export default function Home() {
           <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
             <div className="text-gray-400 font-medium">Unclaimed rewards:</div>{" "}
             <div className="font-bold text-accentdark">
-              {commaNumber(unclaimedRewards)} RPST
+              {commaNumber(unclaimedRewards)} BUSD
             </div>
             <div className="font-bold">
-              ${commaNumber(unclaimedRewardsInUsd)}
             </div>
           </div>
           <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
@@ -210,35 +206,36 @@ export default function Home() {
             </div>{" "}
             <div className="font-bold">
               <div className="text-accentdark">
-                {commaNumber(totalRewardsDistributed)}
+                {commaNumber(totalRewardsDistributed)} BUSD
               </div>
-              ${commaNumber(totalRewardsInUsd)}
             </div>
           </div>
         </div>
         <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-bold w-full text-dollarsDark ">
           <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
             <div className="text-gray-400 font-medium">
-              Your rewards over time:
+              Total Betting Volume:
             </div>{" "}
             <div className="font-bold">
               <div className="text-accentdark">
-                {commaNumber(totalFees)} RPST
+                {commaNumber(totalBettingVolume)} BNB
               </div>
+              ${commaNumber(totalBettingVolumeInUsd)}
             </div>
           </div>
           <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">Rewards per cycle:</div>
+            <div className="text-gray-400 font-medium">Buyback balance:</div>
             <div className="text-accentdark font-bold">
-              {commaNumber(maxWallet)} RPST
+            {commaNumber(buybackBalance)} BNB
             </div>
+            ${commaNumber(buyBackBalanceInUsd)}
           </div>
           <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
             <div className="text-gray-400 font-medium">
-              Answer to the ultimate question:
+              Max Transaction Amount:
             </div>{" "}
             <div className="font-bold">
-              <div className="text-accentdark">42</div>
+              <div className="text-accentdark">{commaNumber(maxTx)} RPST</div>
             </div>
           </div>
         </div>
