@@ -1,0 +1,34 @@
+[
+    {
+        "inputs": [],
+        "name": "totalDividends",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }, 
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "shareholder",
+            "type": "address"
+          }
+        ],
+        "name": "getUnpaidEarnings",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+]

@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import commaNumber from "comma-number";
 import Head from "next/head";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { web3Instance } from "../functions/config";
+import { retrievePricingData } from "../functions/smartContractCall";
 
 export default function Home() {
   // prettier-ignore
@@ -15,38 +17,77 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const bscAddress = useRef(undefined);
 
-  const [price, setPrice] = useState(0.0000012345658954123);
-  const [marketCap, setMarketCap] = useState("123321512");
-  const [circulatingSupply, setCirculatingSupply] = useState(123321513812);
-  const [unclaimedRewards, setUnclaimedRewards] = useState(123567);
-  const [rewardsPerCycle, setRewardsPerCycle] = useState(3213112332);
-  const [balance, setBalance] = useState(3213112332);
-  const [answerToTheUltimateQuestion, setAnswerToTheUltimateQuestion] =
-    useState(42);
-  const [totalRewardsDistributed, settotalRewardsDistributed] =
-    useState(321311233223);
-  const [yourRewardsOverTime, setYourRewardsOverTime] = useState(512567989);
+  const [price, setPrice] = useState('0.0000012345658954123');
+  const [marketCap, setMarketCap] = useState('0');
+  const [circulatingSupply, setCirculatingSupply] = useState('0');
+  const [unclaimedRewards, setUnclaimedRewards] = useState('0');
+  const [unclaimedRewardsInUsd, setUnclaimedRewardsInUsd] = useState('0');
+  const [maxTx, setMaxTx] = useState('0');
+  const [maxWallet, setMaxWallet] = useState('0')
+  const [balance, setBalance] = useState('0');
+  const [balanceInUsd, setBalanceInUsd] = useState('0');
+  const [totalFees, setTotalFees] = useState(18);
+  const [totalRewardsDistributed, setTotalRewardsDistributed] = useState('0');
+  const [totalRewardsInUsd, setTotalRewardsInUsd] = useState('0');
 
-  // ------------ FUNCITONS ------------- //
-  function getPrice(amount: number) {
-    return (amount * price).toFixed(2);
-  }
+  // ------------ FUNCTIONS ------------- //
+  // function getPrice(amount: number) {
+  //   return (amount * price).toFixed(2);
+  // }
 
   // ------------ ON LOAD ------------- //
 
   useEffect(() => {
     const myTimeout = setTimeout(() => setIsLoading(false), 3000);
+    async function loadData(){
+      const pricingData = await retrievePricingData(null);
+      setPrice(pricingData.tokenPrice);
+      setCirculatingSupply(pricingData.circulatingSupply);
+      setMarketCap(pricingData.marketCap);
+      setTotalFees(pricingData.totalFees);
+      setMaxTx(pricingData.maxTx);
+      setMaxWallet(pricingData.maxWallet);
+      setTotalRewardsDistributed(pricingData.totalRewards);
+      setTotalRewardsInUsd(pricingData.totalRewardsInUsd);
+    }
+    
+    loadData();
     return () => {
       clearTimeout(myTimeout);
     };
-  }, []);
+  }, [isLoading]);
 
   // ------------ ON CLICK ------------- //
-  function handleBscAddress(ref: MutableRefObject<any>) {
-    const address = ref.current.value;
-    address.length
-      ? alert("Current BSC Address:\n" + address)
-      : alert("Address is empty.");
+  async function handleBscAddress(ref: MutableRefObject<any>) {
+    setIsLoading(true);
+    const myTimeout = setTimeout(() => setIsLoading(false), 5000);
+    let address;
+    try {
+      address = web3Instance.utils.toChecksumAddress(ref.current.value);
+    } catch {
+      alert("Invalid address. Please try again");
+      return;
+    }
+    const isAddress = web3Instance.utils.isAddress(address);
+    if(!isAddress) {
+        alert("Invalid address. Please try again.");
+        return;
+    }
+    
+    const pricingData = await retrievePricingData(address);
+    setPrice(pricingData.tokenPrice);
+    setCirculatingSupply(pricingData.circulatingSupply);
+    setMarketCap(pricingData.marketCap);
+    setTotalFees(pricingData.totalFees);
+    setMaxTx(pricingData.maxTx);
+    setMaxWallet(pricingData.maxWallet);
+    setTotalRewardsDistributed(pricingData.totalRewards);
+    setTotalRewardsInUsd(pricingData.totalRewardsInUsd);
+    setBalance(pricingData.holdersBalance);
+    setBalanceInUsd(pricingData.holdersBalanceInUsd);
+    setUnclaimedRewards(pricingData.unpaidRewards);
+    setUnclaimedRewardsInUsd(pricingData.unpaidRewardsInUsd);
+    return;
   }
 
   return (
@@ -153,7 +194,7 @@ export default function Home() {
               {commaNumber(unclaimedRewards)} RPST
             </div>
             <div className="font-bold">
-              ${commaNumber(getPrice(unclaimedRewards))}
+              ${commaNumber(unclaimedRewardsInUsd)}
             </div>
           </div>
           <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
@@ -161,7 +202,7 @@ export default function Home() {
             <div className="font-bold text-accentdark">
               {commaNumber(balance)} RPST
             </div>
-            <div className="font-bold">${commaNumber(getPrice(balance))}</div>
+            <div className="font-bold">${commaNumber(balanceInUsd)}</div>
           </div>
           <div className="bg-main saturate-150 brightness-150  rounded-md px-5 py-3 w-full shadow-md">
             <div className="text-gray-400 font-medium">
@@ -171,7 +212,7 @@ export default function Home() {
               <div className="text-accentdark">
                 {commaNumber(totalRewardsDistributed)}
               </div>
-              ${commaNumber(getPrice(totalRewardsDistributed))}
+              ${commaNumber(totalRewardsInUsd)}
             </div>
           </div>
         </div>
@@ -182,17 +223,15 @@ export default function Home() {
             </div>{" "}
             <div className="font-bold">
               <div className="text-accentdark">
-                {commaNumber(yourRewardsOverTime)} RPST
+                {commaNumber(totalFees)} RPST
               </div>
-              ${commaNumber(getPrice(yourRewardsOverTime))}
             </div>
           </div>
           <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
             <div className="text-gray-400 font-medium">Rewards per cycle:</div>
             <div className="text-accentdark font-bold">
-              {commaNumber(rewardsPerCycle)} RPST
+              {commaNumber(maxWallet)} RPST
             </div>
-            ${commaNumber(getPrice(rewardsPerCycle))}
           </div>
           <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
             <div className="text-gray-400 font-medium">
