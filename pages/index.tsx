@@ -4,8 +4,44 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import commaNumber from "comma-number";
 import Head from "next/head";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { CustomWindow } from "../types/window";
+
+function shortenAddress(address: string) {
+  const firstPart = address.slice(0, 2);
+  const secondPart = address.slice(address.length - 4, address.length);
+  return [firstPart, secondPart].join("...");
+}
+
+function semiShortenAddress(address: string) {
+  const firstPart = address.slice(0, 2);
+  const secondPart = address.slice(address.length - 12, address.length);
+  return [firstPart, secondPart].join("...");
+}
+
+async function logInWithMetamask(
+  before: () => void,
+  after: () => void,
+  setAddress: React.Dispatch<React.SetStateAction<string | null>>
+): Promise<string | null> {
+  const ethereum = (window as unknown as CustomWindow).ethereum;
+  try {
+    before();
+
+    await ethereum.request({ method: "eth_requestAccounts" });
+    const addy = await ethereum.request({ method: "eth_accounts" });
+    setAddress(addy[0]);
+    after();
+    // console.log({ addy });
+    return addy[0];
+  } catch (e) {
+    // Metamask error. Null means "error, reload window and try again".
+    // console.log("breach of construct");
+    return null;
+  }
+}
 
 export default function Home() {
+  const [connectedAddress, setConnectedAddress] = useState(undefined);
   // prettier-ignore
   const accentGradient = /*<a className="*/ 'bg-gradient-to-br from-lightbg to-lighterbg'; /* "> */
   //const accentGradient = "";
@@ -27,9 +63,29 @@ export default function Home() {
     useState(321311233223);
   const [yourRewardsOverTime, setYourRewardsOverTime] = useState(512567989);
 
-  // ------------ FUNCITONS ------------- //
+  // ------------ FUNCTIONS ------------- //
   function getPrice(amount: number) {
     return (amount * price).toFixed(2);
+  }
+  function isAddress(address: string) {
+    if (typeof address === "string" && address.startsWith("0x")) return true;
+    return false;
+    // try {
+    //   const checksumAddress = web3Instance.utils.toChecksumAddress(address);
+    //   return web3Instance.utils.isAddress(checksumAddress);
+    // } catch {
+    //   return false;
+    // }
+  }
+
+  function handleAccountsChanged(accounts: string[]) {
+    if (accounts.length === 0) {
+      // MetaMask is locked or the user has not connected any accounts
+      alert("Please connect to MetaMask.");
+    } else if (accounts[0] !== connectedAddress) {
+      setConnectedAddress(accounts[0]);
+      // Do any other work!
+    }
   }
 
   // ------------ ON LOAD ------------- //
@@ -51,6 +107,15 @@ export default function Home() {
 
   // ------------ ON CLICK ------------- //
   function handleBscAddress(ref: MutableRefObject<any>) {
+    const address = ref.current.value;
+    if (!isAddress(address)) {
+      alert("Invalid address. Please try again.");
+      return;
+    }
+    setIsLoading(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Set address to localStorage on button click & valid
+    window.localStorage.setItem("preferredAddress", address);
     setIsLoading(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => setIsLoading(false), 1000);
@@ -126,11 +191,27 @@ export default function Home() {
       `}
         </style>
       </Head>
-      <div className="h-full w-full bg-aside rounded-xl shadow-lg px-5 py-10 flex flex-col items-center focus:border-red-500">
+      <div className="h-full w-full bg-aside rounded-xl shadow-lg px-5 py-10 flex flex-col items-center focus:border-red-500 relative">
+        <div
+          className="absolute top-3 right-5 h-8 px-8 bg-accentdark flex items-center justify-center font-semibold font-title rounded-lg shadow-md select-none cursor-pointer hover:bg-accentlight active:brightness-110 active:shadow-lg"
+          onClick={() =>
+            logInWithMetamask(
+              () => {
+                setIsLoading(true);
+              },
+              () => {
+                setIsLoading(false);
+              },
+              setConnectedAddress
+            )
+          }
+        >
+          {connectedAddress ? shortenAddress(connectedAddress) : "Connect"}
+        </div>
         <img
           src="/logo.png"
           alt="Rock Paper Scissors Token (RPST) Logo"
-          className="w-64"
+          className="w-64 xs:w-96 mt-10 mb-3"
         />
         <div className="flex items-center max-w-xl w-full shadow-md mt-5 border-red-500">
           <input
