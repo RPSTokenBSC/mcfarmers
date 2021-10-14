@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import commaNumber from "comma-number";
 import Head from "next/head";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { web3Instance } from "../functions/config";
+import { retrievePricingData } from "../functions/smartContractCall";
 import { CustomWindow } from "../types/window";
 
 function shortenAddress(address: string) {
@@ -25,11 +27,13 @@ async function logInWithMetamask(
 ): Promise<string | null> {
   const ethereum = (window as unknown as CustomWindow).ethereum;
   try {
+    console.log('bout to run "before"');
     before();
 
     await ethereum.request({ method: "eth_requestAccounts" });
     const addy = await ethereum.request({ method: "eth_accounts" });
     setAddress(addy[0]);
+    console.log('bout to run "after"');
     after();
     // console.log({ addy });
     return addy[0];
@@ -42,40 +46,35 @@ async function logInWithMetamask(
 
 export default function Home() {
   const [connectedAddress, setConnectedAddress] = useState(undefined);
-  // prettier-ignore
-  const accentGradient = /*<a className="*/ 'bg-gradient-to-br from-lightbg to-lighterbg'; /* "> */
-  //const accentGradient = "";
-  /*<a className="*/ ("bg-gradient-to-br from-lightbg to-lighterbg"); /* "> */
   // ------------ DASHBOARD STATES ------------- //
 
   const [isLoading, setIsLoading] = useState(true);
   const bscAddress = useRef(undefined);
 
-  const [price, setPrice] = useState(0.0000012345658954123);
-  const [marketCap, setMarketCap] = useState("123321512");
-  const [circulatingSupply, setCirculatingSupply] = useState(123321513812);
-  const [unclaimedRewards, setUnclaimedRewards] = useState(123567);
-  const [rewardsPerCycle, setRewardsPerCycle] = useState(3213112332);
-  const [balance, setBalance] = useState(3213112332);
-  const [answerToTheUltimateQuestion, setAnswerToTheUltimateQuestion] =
-    useState(42);
-  const [totalRewardsDistributed, settotalRewardsDistributed] =
-    useState(321311233223);
-  const [yourRewardsOverTime, setYourRewardsOverTime] = useState(512567989);
+  const [price, setPrice] = useState("0.0000012345658954123");
+  const [marketCap, setMarketCap] = useState("0");
+  const [circulatingSupply, setCirculatingSupply] = useState("0");
+  const [unclaimedRewards, setUnclaimedRewards] = useState("0");
+  const [maxTx, setMaxTx] = useState("0");
+  const [balance, setBalance] = useState("0");
+  const [balanceInUsd, setBalanceInUsd] = useState("0");
+  const [totalBettingVolume, setTotalBettingVolume] = useState(0);
+  const [totalBettingVolumeInUsd, setTotalBettingVolumeInUsd] = useState("0");
+  const [totalRewardsDistributed, setTotalRewardsDistributed] = useState("0");
+  const [buybackBalance, setBuybackBalance] = useState(0);
+  const [buyBackBalanceInUsd, setBuyBackBalanceInUsd] = useState("0");
 
   // ------------ FUNCTIONS ------------- //
-  function getPrice(amount: number) {
-    return (amount * price).toFixed(2);
-  }
-  function isAddress(address: string) {
-    if (typeof address === "string" && address.startsWith("0x")) return true;
-    return false;
-    // try {
-    //   const checksumAddress = web3Instance.utils.toChecksumAddress(address);
-    //   return web3Instance.utils.isAddress(checksumAddress);
-    // } catch {
-    //   return false;
-    // }
+  // function getPrice(amount: number) {
+  //   return (amount * price).toFixed(2);
+  // }
+  function isAddress(address: string): boolean {
+    try {
+      web3Instance.utils.toChecksumAddress(address);
+      return web3Instance.utils.isAddress(address);
+    } catch {
+      return false;
+    }
   }
 
   function handleAccountsChanged(accounts: string[]) {
@@ -91,44 +90,60 @@ export default function Home() {
   // ------------ ON LOAD ------------- //
 
   useEffect(() => {
-    const address = window.localStorage.getItem("preferredAddress");
-    console.log(address);
-    if (
-      (typeof address === "string" && address?.length && address !== "null") ||
-      (address !== "undefined" && address?.startsWith("0x"))
-    ) {
-      bscAddress.current.value = address;
+    async function loadData() {
+      const address = window.localStorage.getItem("preferredAddress");
+
+      const pricingData = await retrievePricingData(
+        isAddress(address) ? address : null
+      );
+      setIsLoading(false);
+      setPrice(pricingData.tokenPrice);
+      setCirculatingSupply(pricingData.circulatingSupply);
+      setMarketCap(pricingData.marketCap);
+      setTotalBettingVolume(pricingData.totalBettingVolume);
+      setTotalBettingVolumeInUsd(pricingData.totalBettingVolumeInUsd);
+      setMaxTx(pricingData.maxTx);
+      setTotalRewardsDistributed(pricingData.totalRewards);
+      setBuybackBalance(pricingData.buybackBalance);
+      setBuyBackBalanceInUsd(pricingData.buybackBalanceInUsd);
+      setBalance(pricingData.holdersBalance);
+      setBalanceInUsd(pricingData.holdersBalanceInUsd);
+      setBuyBackBalanceInUsd(pricingData.holdersBalanceInUsd);
+      setUnclaimedRewards(pricingData.unpaidRewards);
     }
-    const myTimeout = setTimeout(() => setIsLoading(false), 2000);
-    return () => {
-      clearTimeout(myTimeout);
-    };
-  }, []);
+
+    loadData();
+    return;
+  }, [isLoading]);
 
   // ------------ ON CLICK ------------- //
-  function handleBscAddress(ref: MutableRefObject<any>) {
+  async function handleBscAddress(ref: MutableRefObject<any>) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     const address = ref.current.value;
     if (!isAddress(address)) {
       alert("Invalid address. Please try again.");
       return;
     }
     setIsLoading(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    // Set address to localStorage on button click & valid
-    window.localStorage.setItem("preferredAddress", address);
-    setIsLoading(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    setTimeout(() => setIsLoading(false), 1000);
-    console.log({ value: ref.current?.value, type: typeof ref.current?.value });
-    ref.current?.value?.length &&
-      ref?.current?.value?.startsWith("0x") &&
-      //? (alert("Current BSC Address:\n" + ref.current?.value),
-      window.localStorage.setItem("preferredAddress", ref.current?.value); //)
-    //: alert("Address is empty or doesn't start with 0x.");
+    window.localStorage.setItem("preferredAddress", ref.current?.value);
+
+    const pricingData = await retrievePricingData(address);
+    setIsLoading(false);
+    setPrice(pricingData.tokenPrice);
+    setCirculatingSupply(pricingData.circulatingSupply);
+    setMarketCap(pricingData.marketCap);
+    setTotalBettingVolume(pricingData.totalBettingVolume);
+    setTotalBettingVolumeInUsd(pricingData.totalBettingVolumeInUsd);
+    setMaxTx(pricingData.maxTx);
+    setTotalRewardsDistributed(pricingData.totalRewards);
+    setBalance(pricingData.holdersBalance);
+    setBalanceInUsd(pricingData.holdersBalanceInUsd);
+    setUnclaimedRewards(pricingData.unpaidRewards);
+    return;
   }
 
   function handleClaimDividend() {
-    alert("Claiming dividend.");
+    alert("This feature will be added shortly");
   }
 
   return (
@@ -253,9 +268,9 @@ export default function Home() {
           <div className="bg-elevatedbg saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
             <div className="text-gray-300 font-normal">Unclaimed rewards:</div>{" "}
             <div className="font-bold text-accentdark">
-              {commaNumber(unclaimedRewards)} RPST
+              {commaNumber(unclaimedRewards)} BUSD
             </div>
-            <div className="">${commaNumber(getPrice(unclaimedRewards))}</div>
+            <div className=""></div>
             <div
               onClick={handleClaimDividend}
               className="w-full py-1.5 mt-3 font-bold text-lg bg-accentdark brightness-75 hover:brightness-100 select-none hover:cursor-pointer active:saturate-150 text-mainbg flex items-center justify-center rounded-md font-title"
@@ -268,45 +283,44 @@ export default function Home() {
             <div className="font-bold text-accentdark">
               {commaNumber(balance)} RPST
             </div>
-            <div className="">${commaNumber(getPrice(balance))}</div>
+            <div className="font-bold">${commaNumber(balanceInUsd)}</div>
           </div>
           <div className="bg-elevatedbg saturate-150 brightness-150  rounded-md px-5 py-3 w-full shadow-md">
             <div className="text-gray-300 font-normal">
               Total Rewards Distributed:
             </div>{" "}
-            <div className="">
-              <div className="text-accentdark font-bold">
-                {commaNumber(totalRewardsDistributed)} RPST
+            <div className="font-bold">
+              <div className="text-accentdark">
+                {commaNumber(totalRewardsDistributed)} BUSD
               </div>
-              ${commaNumber(getPrice(totalRewardsDistributed))}
             </div>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full text-dollarsDark font-medium ">
-          <div className="bg-elevatedbg saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-300 font-normal">
-              Your rewards over time:
-            </div>{" "}
-            <div className="">
-              <div className="text-accentdark font-bold">
-                {commaNumber(yourRewardsOverTime)} RPST
-              </div>
-              ${commaNumber(getPrice(yourRewardsOverTime))}
-            </div>
-          </div>
-          <div className="bg-elevatedbg saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md font-medium">
-            <div className="text-gray-300 font-normal">Rewards per cycle:</div>
-            <div className="text-accentdark font-bold">
-              {commaNumber(rewardsPerCycle)} RPST
-            </div>
-            ${commaNumber(getPrice(rewardsPerCycle))}
-          </div>
-          <div className="bg-elevatedbg saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-300 font-normal">
-              Answer to the ultimate question:
+        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-bold w-full text-dollarsDark ">
+          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-400 font-medium">
+              Total Betting Volume:
             </div>{" "}
             <div className="font-bold">
-              <div className="text-accentdark">42</div>
+              <div className="text-accentdark">
+                {commaNumber(totalBettingVolume)} BNB
+              </div>
+              ${commaNumber(totalBettingVolumeInUsd)}
+            </div>
+          </div>
+          <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-400 font-medium">Buyback balance:</div>
+            <div className="text-accentdark font-bold">
+              {commaNumber(buybackBalance)} BNB
+            </div>
+            ${commaNumber(buyBackBalanceInUsd)}
+          </div>
+          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
+            <div className="text-gray-400 font-medium">
+              Max Transaction Amount:
+            </div>{" "}
+            <div className="font-bold">
+              <div className="text-accentdark">{commaNumber(maxTx)} RPST</div>
             </div>
           </div>
         </div>
