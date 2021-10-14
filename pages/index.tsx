@@ -28,18 +28,21 @@ async function logInWithMetamask(
   const ethereum = (window as unknown as CustomWindow).ethereum;
   try {
     console.log('bout to run "before"');
-    before();
+    // before();
 
     await ethereum.request({ method: "eth_requestAccounts" });
+    // setTimeout(after, 5000);
     const addy = await ethereum.request({ method: "eth_accounts" });
     setAddress(addy[0]);
     console.log('bout to run "after"');
-    after();
+    // after();
     // console.log({ addy });
     return addy[0];
   } catch (e) {
     // Metamask error. Null means "error, reload window and try again".
     // console.log("breach of construct");
+    console.error(e);
+    after();
     return null;
   }
 }
@@ -48,6 +51,7 @@ export default function Home() {
   const [connectedAddress, setConnectedAddress] = useState(undefined);
   // ------------ DASHBOARD STATES ------------- //
 
+  const [infoLoadTrigger, setInfoLoadTrigger] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const bscAddress = useRef(undefined);
 
@@ -68,6 +72,9 @@ export default function Home() {
   // function getPrice(amount: number) {
   //   return (amount * price).toFixed(2);
   // }
+  function triggerInfoLoad() {
+    setInfoLoadTrigger(infoLoadTrigger ? 0 : 1);
+  }
   function isAddress(address: string): boolean {
     try {
       web3Instance.utils.toChecksumAddress(address);
@@ -114,10 +121,11 @@ export default function Home() {
 
     loadData();
     return;
-  }, [isLoading]);
+  }, [infoLoadTrigger]);
 
   // ------------ ON CLICK ------------- //
   async function handleBscAddress(ref: MutableRefObject<any>) {
+    triggerInfoLoad();
     window.scrollTo({ top: 0, behavior: "smooth" });
     const address = ref.current.value;
     if (!isAddress(address)) {
@@ -143,6 +151,7 @@ export default function Home() {
   }
 
   function handleClaimDividend() {
+    triggerInfoLoad();
     alert("This feature will be added shortly");
   }
 
