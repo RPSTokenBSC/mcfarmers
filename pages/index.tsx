@@ -1,9 +1,15 @@
 import { faTelegramPlane, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { faLink } from "@fortawesome/free-solid-svg-icons";
+import { faLink, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import commaNumber from "comma-number";
 import Head from "next/head";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
+import BoxDollars from "../components/BoxDollars";
+import BoxTitle from "../components/BoxTitle";
+import BoxValue from "../components/BoxValue";
+import Button from "../components/Button";
+import LightBox from "../components/LightBox";
+import Social from "../components/Social";
 import { web3Instance } from "../functions/config";
 import { retrievePricingData } from "../functions/smartContractCall";
 import { CustomWindow } from "../types/window";
@@ -127,7 +133,7 @@ export default function Home() {
   async function handleBscAddress(ref: MutableRefObject<any>) {
     triggerInfoLoad();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    const address = ref.current.value;
+    const address = ref.current?.value;
     if (!isAddress(address)) {
       alert("Invalid address. Please try again.");
       return;
@@ -155,13 +161,25 @@ export default function Home() {
     alert("This feature will be added shortly");
   }
 
+  function handleConnect() {
+    return logInWithMetamask(
+      () => {
+        setIsLoading(true);
+      },
+      () => {
+        setIsLoading(false);
+      },
+      setConnectedAddress
+    );
+  }
+
   return (
     <div
       className={
         (isLoading
           ? "overflow-hidden max-h-screen"
           : "overflow-auto max-h-full") +
-        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80 bg-mainbg"
+        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80 bg-landscape bg-cover font-body"
       }
       // style={{ backgroundImage: 'url("/assets/genericblue.png")' }}
     >
@@ -209,150 +227,130 @@ export default function Home() {
         <style>
           {`
         @import
-        url(https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Open+Sans:wght@400;500;700&display=swap);
+        url(https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Open+Sans:wght@400;500;700&display=swap);
         /*html, body, #__next { min-height: 100%; height: 100% }*/
         
       `}
         </style>
       </Head>
-      <div className="h-full w-full bg-aside rounded-xl shadow-lg px-5 py-10 flex flex-col items-center focus:border-red-500 relative">
-        <div
-          className="absolute top-3 right-5 h-8 px-8 bg-accentdark flex items-center justify-center font-semibold font-title rounded-lg shadow-md select-none cursor-pointer hover:bg-accentlight active:brightness-110 active:shadow-lg"
-          onClick={() =>
-            logInWithMetamask(
-              () => {
-                setIsLoading(true);
-              },
-              () => {
-                setIsLoading(false);
-              },
-              setConnectedAddress
-            )
-          }
-        >
-          {connectedAddress ? shortenAddress(connectedAddress) : "Connect"}
-        </div>
-        <img
-          src="/logo.png"
-          alt="Rock Paper Scissors Token (RPST) Logo"
-          className="w-64 xs:w-96 mt-10 mb-3"
-        />
-        <div className="flex items-center max-w-xl w-full shadow-md mt-5 border-red-500">
+      <div className="h-full w-full bg-aside rounded-xl shadow-lg px-5 pt-10 pb-4 flex flex-col items-center focus:border-red-500 relative">
+        <Button onClick={handleConnect} className="absolute top-3 right-5">
+          {" "}
+          {connectedAddress ? shortenAddress(connectedAddress) : "Connect"}{" "}
+        </Button>
+        <a href="https://www.flipperstoken.com/" target="_blank">
+          <img
+            src="/assets/logo.svg"
+            alt="Rock Paper Scissors Token (FLIP) Logo"
+            className="w-64 xs:w-96 mt-10 mb-3"
+          />
+        </a>
+        <div className="flex items-center max-w-xl w-full  mt-5 border-red-500">
+          {/* Input to search BSC address */}
           <input
+            ref={bscAddress}
+            className="w-full border-accentdark text-black px-5 h-10 mr-4 text-lg font-normal tracking-wide text-gray-800 border-2 border-gray-500 rounded-lg focus:outline-none focus:border-red-500 font-title"
+            type="text"
+            placeholder="Enter BSC address"
+          />
+          {/* <input
             ref={bscAddress}
             type="text"
             className={
-              "w-full bg-elevatedbg border-l border-t border-b border-gray-700 brightness-75 " +
-              "focus:brightness-125 hover:brightness-110 rounded-l-md text-white h-10  px-5 outline-none"
+              "w-full bg-[#FFF] border-[3px] border-r-0 border-black  outline-none " +
+              " hover:border-accentlight active:border-accentlight focus:border-accentlight text-black h-12  px-5 outline-none shadow-md rounded-none"
             }
             placeholder="Please paste your BSC address"
-          />
-          <div
+          /> */}
+          <Button onClick={() => handleBscAddress(bscAddress)}>
+            <FontAwesomeIcon icon={faSearch} className="text-white h-6 w-6" />
+          </Button>
+          {/* <button
+            className="h-12  w-14  text-white font-medium font-title rounded-none shadow-md hover:contrast-150 select-none cursor-pointer text-xl uppercase tracking-wide flex items-center justify-center bg-gradient-to-br from-accentlight to-accentdark"
             onClick={() => handleBscAddress(bscAddress)}
-            className="h-10 flex items-center justify-center bg-gradient-to-br from-accentlight to-accentdark rounded-r-md px-3 font-semibold font-title pt-1 text-main hover:contrast-150 select-none cursor-pointer"
           >
             Go
-          </div>
+          </button> */}
+          {/* <div
+            onClick={() => handleBscAddress(bscAddress)}
+            className="ml-5 h-10 flex items-center justify-center bg-gradient-to-br from-accentlight to-accentdark rounded-r-md px-3 font-medium tracking-wide font-title text-white hover:contrast-150 select-none cursor-pointer text-xl uppercase "
+          >
+            Go
+          </div> */}
         </div>
         <div className="flex flex-col lg:flex-row mt-10 space-x-0 space-y-1 lg:space-y-0 lg:space-x-5 font-semibold w-full text-white">
-          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium">
-            <span className="text-gray-300 font-medium">Price:&nbsp;</span>$
+          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium font-title text-lg tracking-wide">
+            <span className="text-accentdark font-normal">Price:&nbsp;</span>$
             {commaNumber(price)}
           </div>
-          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium">
-            <span className="text-gray-300 font-medium">Market Cap:&nbsp;</span>
+          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium font-title text-lg tracking-wide">
+            <span className="text-accentdark font-normal">
+              Market Cap:&nbsp;
+            </span>
             ${commaNumber(marketCap)}
           </div>
-          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium">
-            <span className="text-gray-300 font-medium">
+          <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium font-title text-lg tracking-wide">
+            <span className="text-accentdark font-normal">
               Circulating Supply:&nbsp;
             </span>
 
             <span className="text-accentlight">
-              {commaNumber(circulatingSupply)} RPST
+              {commaNumber(circulatingSupply)} FLIP
             </span>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full text-dollarsDark font-medium ">
-          <div className="bg-elevatedbg saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-300 font-normal">Unclaimed rewards:</div>{" "}
-            <div className="font-bold text-accentdark">
-              {commaNumber(unclaimedRewards)} BUSD
-            </div>
-            <div className=""></div>
-            <div
-              onClick={handleClaimDividend}
-              className="w-full py-1.5 mt-3 font-bold text-lg bg-accentdark brightness-75 hover:brightness-100 select-none hover:cursor-pointer active:saturate-150 text-mainbg flex items-center justify-center rounded-md font-title"
-            >
+        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full">
+          <LightBox>
+            <BoxTitle>Unclaimed rewards:</BoxTitle>{" "}
+            <BoxValue>{commaNumber(unclaimedRewards)} BUSD</BoxValue>
+            <Button onClick={handleClaimDividend} className="mt-2">
               Claim dividend
-            </div>
-          </div>
-          <div className="bg-elevatedbg saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-300 font-normal">Balance:</div>
-            <div className="font-bold text-accentdark">
-              {commaNumber(balance)} RPST
-            </div>
-            <div className="font-bold">${commaNumber(balanceInUsd)}</div>
-          </div>
-          <div className="bg-elevatedbg saturate-150 brightness-150  rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-300 font-normal">
-              Total Rewards Distributed:
-            </div>{" "}
-            <div className="font-bold">
-              <div className="text-accentdark">
-                {commaNumber(totalRewardsDistributed)} BUSD
-              </div>
-            </div>
-          </div>
+            </Button>
+          </LightBox>
+          <LightBox>
+            <BoxTitle>Balance:</BoxTitle>
+            <BoxValue>{commaNumber(balance)} FLIP</BoxValue>
+            <BoxDollars>${commaNumber(balanceInUsd)}</BoxDollars>
+          </LightBox>
+          <LightBox>
+            <BoxTitle>Total Rewards Distributed:</BoxTitle>{" "}
+            <BoxValue>{commaNumber(totalRewardsDistributed)} BUSD</BoxValue>
+          </LightBox>
         </div>
-        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 font-bold w-full text-dollarsDark ">
-          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">
-              Total Betting Volume:
-            </div>{" "}
-            <div className="font-bold">
-              <div className="text-accentdark">
-                {commaNumber(totalBettingVolume)} BNB
-              </div>
-              ${commaNumber(totalBettingVolumeInUsd)}
-            </div>
-          </div>
-          <div className="bg-main saturate-150  brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">Buyback balance:</div>
-            <div className="text-accentdark font-bold">
-              {commaNumber(buybackBalance)} BNB
-            </div>
-            ${commaNumber(buyBackBalanceInUsd)}
-          </div>
-          <div className="bg-main saturate-150 brightness-150 rounded-md px-5 py-3 w-full shadow-md">
-            <div className="text-gray-400 font-medium">
-              Max Transaction Amount:
-            </div>{" "}
-            <div className="font-bold">
-              <div className="text-accentdark">{commaNumber(maxTx)} RPST</div>
-            </div>
-          </div>
+        <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full">
+          <LightBox highlight={true}>
+            <BoxTitle>Total Betting Volume:</BoxTitle>
+            <BoxValue>{commaNumber(totalBettingVolume)} FLIP</BoxValue>
+            <BoxDollars>${commaNumber(totalBettingVolumeInUsd)}</BoxDollars>
+          </LightBox>
+          <LightBox highlight={true}>
+            <BoxTitle>Buyback balance:</BoxTitle>
+            <BoxValue>{commaNumber(buybackBalance)} BNB</BoxValue>
+            <BoxDollars>${commaNumber(buyBackBalanceInUsd)}</BoxDollars>
+          </LightBox>
+          <LightBox highlight={true}>
+            <BoxTitle>Max Transaction Amount:</BoxTitle>
+            <BoxValue>{commaNumber(maxTx)} FLIP</BoxValue>
+          </LightBox>
         </div>
-      </div>
-      <div className="h-10 mt-8 flex text-2xl text-accentdark w-full justify-center space-x-5">
-        <a href="https://twitter.com/RPS_Token" target="_blank">
-          <FontAwesomeIcon
+        <div className="h-10 mt-8 flex text-2xl text-accentdark w-full justify-center space-x-5">
+          <Social
             icon={faTwitter}
-            className="h-10 hover:brightness-150 hover:saturate-200"
+            link={"https://twitter.com/FlipperTokenbsc"}
+            name="Flippers Twitter Link"
           />
-        </a>
-        <a href="https://t.me/RPSTOfficial" target="_blank">
-          <FontAwesomeIcon
+          <Social
             icon={faTelegramPlane}
-            className="h-10 hover:brightness-150 hover:saturate-200"
+            link={"https://t.me/FlipperToken"}
+            name="Flippers Telegram Link"
           />
-        </a>
-        <a href="https://www.rpstokenbsc.com/" target="_blank">
-          <FontAwesomeIcon
+          <Social
             icon={faLink}
-            className="h-8 ml-2 mt-1 hover:brightness-150 hover:saturate-200"
+            link={"https://flipperstoken.com/"}
+            name="Flippers Website Link"
+            smol={true}
           />
-        </a>
+        </div>
       </div>
     </div>
   );
