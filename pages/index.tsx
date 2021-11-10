@@ -201,7 +201,6 @@ export default function Home() {
       <Head>
         <title>DASHBOARD | FLIPPER TOKEN</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-
         <link
           rel="apple-touch-icon"
           sizes="180x180"
@@ -221,9 +220,10 @@ export default function Home() {
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
-        <meta name="msapplication-TileColor" content="#da532c" />
+        <meta name="apple-mobile-web-app-title" content="Flippers" />
+        <meta name="application-name" content="Flippers" />
+        <meta name="msapplication-TileColor" content="#00aba9" />
         <meta name="theme-color" content="#ffffff" />
-
         <style>
           {`
         @import
