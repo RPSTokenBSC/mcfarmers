@@ -187,19 +187,19 @@ export default function Home() {
         className={
           (isLoading ? "flex" : "hidden") +
           " " +
-          "absolute h-screen w-full bg-gradient-to-br from-mainbg to-darker flex-col justify-center items-center z-30 left-0 top-0 "
+          "absolute h-screen w-full bg-gradient-to-br from-accentlight to-accentdark flex-col justify-center items-center z-30 left-0 top-0 "
         }
       >
         <img
           src="/loading.svg"
           alt="Loading SVG for NanoShiba token dashboard on BSC"
         />
-        <div className="text-2xl text-white font-semibold font-title">
+        <div className="text-2xl text-white font-medium tracking-wide font-title">
           Connecting to blockchain...
         </div>
       </div>
       <Head>
-        <title>Dashboard | Rock, Paper, Scissors Token on BSC</title>
+        <title>DASHBOARD | FLIPPER TOKEN</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
 
         <link
