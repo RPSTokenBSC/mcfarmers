@@ -357,7 +357,7 @@ export default function Home() {
             <a
               href="https://t.me/tristoff"
               target="_blank"
-              className="text-accentdark keychainify-checked"
+              className="text-accentlight hover:brightness-110 hover:saturate-150 hover:underline keychainify-checked"
             >
               @Tristoff
             </a>{" "}
@@ -365,7 +365,7 @@ export default function Home() {
             <a
               href="https://t.me/theunoreverse"
               target="_blank"
-              className="text-accentdark keychainify-checked"
+              className="text-accentlight hover:brightness-110 hover:saturate-150 hover:underline keychainify-checked"
             >
               @TheUnoReverse
             </a>{" "}
