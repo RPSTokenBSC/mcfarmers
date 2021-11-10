@@ -351,6 +351,27 @@ export default function Home() {
             smol={true}
           />
         </div>
+        <div className="mt-3 flex flex-col items-center justify-center w-full h-full text-black font-title tracking-wide">
+          <div className="text-center text-gray-300 text-[15px] font-normal">
+            Contact{" "}
+            <a
+              href="https://t.me/tristoff"
+              target="_blank"
+              className="text-accentdark keychainify-checked"
+            >
+              @Tristoff
+            </a>{" "}
+            or{" "}
+            <a
+              href="https://t.me/theunoreverse"
+              target="_blank"
+              className="text-accentdark keychainify-checked"
+            >
+              @TheUnoReverse
+            </a>{" "}
+            on Telegram to get a custom dashboard or dApp for your token.
+          </div>
+        </div>
       </div>
     </div>
   );
