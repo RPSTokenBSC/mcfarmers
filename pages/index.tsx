@@ -254,28 +254,12 @@ export default function Home() {
         /fonts/woff2/Kallisto Thin Italic.woff2
         /fonts/woff2/Kallisto Thin.woff2
         */
-       /* /fonts/woff2/Kallisto Bold Italic.woff2 */
-        @font-face {
-          font-family: 'Kallisto';
-          font-style: italic;
-          font-weight: 600;
-          src: url('/fonts/woff2/Kallisto Bold Italic.woff2')
-            format('woff2');
-        }
         /* /fonts/woff2/Kallisto Bold.woff2 */
         @font-face {
           font-family: 'Kallisto';
           font-style: normal;
           font-weight: 600;
           src: url('/fonts/woff2/Kallisto Bold.woff2') format('woff2');
-        }
-        /* /fonts/woff2/Kallisto Heavy Italic.woff2 */
-        @font-face {
-          font-family: 'Kallisto';
-          font-style: italic;
-          font-weight: 700;
-          src: url('/fonts/woff2/Kallisto Heavy Italic.woff2')
-            format('woff2');
         }
         /* /fonts/woff2/Kallisto Heavy.woff2 */
         @font-face {
@@ -284,14 +268,6 @@ export default function Home() {
           font-weight: 700;
           src: url('/fonts/woff2/Kallisto Heavy.woff2') format('woff2');
         }
-        /* /fonts/woff2/Kallisto Light Italic.woff2 */
-        @font-face {
-          font-family: 'Kallisto';
-          font-style: italic;
-          font-weight: 300;
-          src: url('/fonts/woff2/Kallisto Light Italic.woff2')
-            format('woff2');
-        }
         /* /fonts/woff2/Kallisto Light.woff2 */
         @font-face {
           font-family: 'Kallisto';
@@ -299,28 +275,12 @@ export default function Home() {
           font-weight: 300;
           src: url('/fonts/woff2/Kallisto Light.woff2') format('woff2');
         }
-        /* /fonts/woff2/Kallisto Medium Italic.woff2 */
-        @font-face {
-          font-family: 'Kallisto';
-          font-style: italic;
-          font-weight: 500;
-          src: url('/fonts/woff2/Kallisto Medium Italic.woff2')
-            format('woff2');
-        }
         /* /fonts/woff2/Kallisto Medium.woff2 */
         @font-face {
           font-family: 'Kallisto';
           font-style: normal;
           font-weight: 500;
           src: url('/fonts/woff2/Kallisto Medium.woff2') format('woff2');
-        }
-        /* /fonts/woff2/Kallisto Thin Italic.woff2 */
-        @font-face {
-          font-family: 'Kallisto';
-          font-style: italic; 
-          font-weight: 100;
-          src: url('/fonts/woff2/Kallisto Thin Italic.woff2')
-            format('woff2');
         }
         /* /fonts/woff2/Kallisto Thin.woff2 */
         @font-face {
