@@ -18,7 +18,7 @@ export default function Social({
       <FontAwesomeIcon
         icon={icon}
         className={
-          (smol ? "h-8 mt-1 ml-2" : "h-10") +
+          (smol ? "h-7 mt-1 ml-2" : "h-10") +
           " hover:brightness-150 hover:saturate-200"
         }
       />

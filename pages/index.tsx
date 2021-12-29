@@ -385,17 +385,17 @@ export default function Home() {
         <div className="h-10 mt-8 flex text-2xl text-accentdark w-full justify-center space-x-5">
           <Social
             icon={faTwitter}
-            link={"https://twitter.com/FlipperTokenbsc"}
+            link={"https://twitter.com/MetaspaceGaming"}
             name="Flippers Twitter Link"
           />
           <Social
             icon={faTelegramPlane}
-            link={"https://t.me/FlipperToken"}
+            link={"https://t.me/MetaspaceGaming"}
             name="Flippers Telegram Link"
           />
           <Social
             icon={faLink}
-            link={"https://flipperstoken.com/"}
+            link={"https://metaspacemoon.com/"}
             name="Flippers Website Link"
             smol={true}
           />
