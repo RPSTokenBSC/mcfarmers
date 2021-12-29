@@ -4,8 +4,8 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     fontFamily: {
-      title: ["Oswald", "sans-serif"],
-      body: ["Open Sans", "sans-serif"],
+      title: ["Kallisto", "sans-serif"],
+      body: ["Poppins", "sans-serif"],
     },
 
     screens: {
@@ -22,10 +22,10 @@ module.exports = {
     },
     extend: {
       colors: {
-        white: "#FBEEF5",
-        aside: "#FBEEF5",
+        white: "#0C1633",
+        aside: "#0C1633",
         mainbg: "#EE82A1",
-        elevatedbg: "#FBEEF5",
+        elevatedbg: "#0C1633",
         cardbg: "#1e2026",
         secondaryText: "#B7BDC6",
         primaryText: "#EAECEF",
@@ -36,16 +36,16 @@ module.exports = {
         textsecondary: "#000000",
         dollars: "#00A050",
         dollarsDark: "#007D2B",
-        accentdark: "#4D73B5",
-        accentlight: "#8083A5",
+        accentdark: "#F712AD",
+        accentlight: "#4D83EF",
         accentsecondary: "#0051F6",
         lightbg: "#BABFC5",
         lighterbg: "#FFFFFF",
         accent: "#F08B0C",
-        pinkWhite: "#FBEEF5",
+        pinkWhite: "#0C1633",
         progressDark: "#C49CB7",
         progressLight: "#EE82A1",
-        aside: "#FBEEF5",
+        aside: "#0C1633",
         aside2: "#EE82A1",
         asideLight: "#EE82A1",
         asideDark: "#C49CB7",
@@ -73,7 +73,7 @@ module.exports = {
         // bottom: "#02183A",
       },
       backgroundImage: {
-        landscape: "url(/assets/landscape.svg)",
+        landscape: "url(/assets/metabg.png)",
         mobileRoadmapBackground: "url(/assets/roadmap-mobile-background.svg)",
         desktopRoadmapBackground: "url(/assets/roadmap-desktop-background.svg)",
         mobileRoadmapPenguins: "url(/assets/roadmap-mobile-penguins.svg)",

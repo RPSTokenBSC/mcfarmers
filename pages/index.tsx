@@ -26,6 +26,19 @@ function semiShortenAddress(address: string) {
   return [firstPart, secondPart].join("...");
 }
 
+function convertToInternationalCurrencySystem(labelValue) {
+  // Nine Zeroes for Billions
+  return Math.abs(Number(labelValue)) >= 1.0e9
+    ? (Math.abs(Number(labelValue)) / 1.0e9).toFixed(2) + " Billion"
+    : // Six Zeroes for Millions
+    Math.abs(Number(labelValue)) >= 1.0e6
+    ? (Math.abs(Number(labelValue)) / 1.0e6).toFixed(2) + " Million"
+    : // Three Zeroes for Thousands
+    Math.abs(Number(labelValue)) >= 1.0e3
+    ? (Math.abs(Number(labelValue)) / 1.0e3).toFixed(2) + "K"
+    : Math.abs(Number(labelValue));
+}
+
 async function logInWithMetamask(
   before: () => void,
   after: () => void,
@@ -179,7 +192,7 @@ export default function Home() {
         (isLoading
           ? "overflow-hidden max-h-screen"
           : "overflow-auto max-h-full") +
-        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80 bg-landscape bg-cover font-body"
+        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80 bg-[#060D1F] bg-landscape bg-cover font-body"
       }
       // style={{ backgroundImage: 'url("/assets/genericblue.png")' }}
     >
@@ -227,9 +240,95 @@ export default function Home() {
         <style>
           {`
         @import
-        url(https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Open+Sans:wght@400;500;700&display=swap);
+        url(https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap);
         /*html, body, #__next { min-height: 100%; height: 100% }*/
-        
+        /* import the following fonts:
+        /fonts/woff2/Kallisto Bold Italic.woff2
+        /fonts/woff2/Kallisto Bold.woff2
+        /fonts/woff2/Kallisto Heavy Italic.woff2
+        /fonts/woff2/Kallisto Heavy.woff2
+        /fonts/woff2/Kallisto Light Italic.woff2
+        /fonts/woff2/Kallisto Light.woff2
+        /fonts/woff2/Kallisto Medium Italic.woff2
+        /fonts/woff2/Kallisto Medium.woff2
+        /fonts/woff2/Kallisto Thin Italic.woff2
+        /fonts/woff2/Kallisto Thin.woff2
+        */
+       /* /fonts/woff2/Kallisto Bold Italic.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: italic;
+          font-weight: 600;
+          src: url('/fonts/woff2/Kallisto Bold Italic.woff2')
+            format('woff2');
+        }
+        /* /fonts/woff2/Kallisto Bold.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: normal;
+          font-weight: 600;
+          src: url('/fonts/woff2/Kallisto Bold.woff2') format('woff2');
+        }
+        /* /fonts/woff2/Kallisto Heavy Italic.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: italic;
+          font-weight: 700;
+          src: url('/fonts/woff2/Kallisto Heavy Italic.woff2')
+            format('woff2');
+        }
+        /* /fonts/woff2/Kallisto Heavy.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: normal;
+          font-weight: 700;
+          src: url('/fonts/woff2/Kallisto Heavy.woff2') format('woff2');
+        }
+        /* /fonts/woff2/Kallisto Light Italic.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: italic;
+          font-weight: 300;
+          src: url('/fonts/woff2/Kallisto Light Italic.woff2')
+            format('woff2');
+        }
+        /* /fonts/woff2/Kallisto Light.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: normal;
+          font-weight: 300;
+          src: url('/fonts/woff2/Kallisto Light.woff2') format('woff2');
+        }
+        /* /fonts/woff2/Kallisto Medium Italic.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: italic;
+          font-weight: 500;
+          src: url('/fonts/woff2/Kallisto Medium Italic.woff2')
+            format('woff2');
+        }
+        /* /fonts/woff2/Kallisto Medium.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: normal;
+          font-weight: 500;
+          src: url('/fonts/woff2/Kallisto Medium.woff2') format('woff2');
+        }
+        /* /fonts/woff2/Kallisto Thin Italic.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: italic; 
+          font-weight: 100;
+          src: url('/fonts/woff2/Kallisto Thin Italic.woff2')
+            format('woff2');
+        }
+        /* /fonts/woff2/Kallisto Thin.woff2 */
+        @font-face {
+          font-family: 'Kallisto';
+          font-style: normal;
+          font-weight: 100;
+          src: url('/fonts/woff2/Kallisto Thin.woff2') format('woff2');
+        }
       `}
         </style>
       </Head>
@@ -240,8 +339,8 @@ export default function Home() {
         </Button>
         <a href="https://www.flipperstoken.com/" target="_blank">
           <img
-            src="/assets/logo.svg"
-            alt="Rock Paper Scissors Token (FLIP) Logo"
+            src="/assets/metalogo2.png"
+            alt="MetaSpace Gaming (MSPACE) Logo"
             className="w-64 xs:w-96 mt-10 mb-3"
           />
         </a>
@@ -249,34 +348,13 @@ export default function Home() {
           {/* Input to search BSC address */}
           <input
             ref={bscAddress}
-            className="w-full border-accentdark text-black px-5 h-10 mr-4 text-lg font-normal tracking-wide text-gray-800 border-2 border-gray-500 rounded-lg focus:outline-none focus:border-red-500 font-title"
+            className="w-full brightness-110 bg-[#242D44] border-accentdark text-white px-5 h-10 mr-4 text-lg font-normal tracking-wide text-gray-800 border-2 border-gray-500 rounded-lg focus:outline-none focus:border-red-500 font-title"
             type="text"
             placeholder="Enter BSC address"
           />
-          {/* <input
-            ref={bscAddress}
-            type="text"
-            className={
-              "w-full bg-[#FFF] border-[3px] border-r-0 border-black  outline-none " +
-              " hover:border-accentlight active:border-accentlight focus:border-accentlight text-black h-12  px-5 outline-none shadow-md rounded-none"
-            }
-            placeholder="Please paste your BSC address"
-          /> */}
           <Button onClick={() => handleBscAddress(bscAddress)}>
             <FontAwesomeIcon icon={faSearch} className="text-white h-6 w-6" />
           </Button>
-          {/* <button
-            className="h-12  w-14  text-white font-medium font-title rounded-none shadow-md hover:contrast-150 select-none cursor-pointer text-xl uppercase tracking-wide flex items-center justify-center bg-gradient-to-br from-accentlight to-accentdark"
-            onClick={() => handleBscAddress(bscAddress)}
-          >
-            Go
-          </button> */}
-          {/* <div
-            onClick={() => handleBscAddress(bscAddress)}
-            className="ml-5 h-10 flex items-center justify-center bg-gradient-to-br from-accentlight to-accentdark rounded-r-md px-3 font-medium tracking-wide font-title text-white hover:contrast-150 select-none cursor-pointer text-xl uppercase "
-          >
-            Go
-          </div> */}
         </div>
         <div className="flex flex-col lg:flex-row mt-10 space-x-0 space-y-1 lg:space-y-0 lg:space-x-5 font-semibold w-full text-white">
           <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium font-title text-lg tracking-wide">
@@ -295,7 +373,7 @@ export default function Home() {
             </span>
 
             <span className="text-accentlight">
-              {commaNumber(circulatingSupply)} FLIP
+              {commaNumber(circulatingSupply)} MSPACE
             </span>
           </div>
         </div>
@@ -309,7 +387,7 @@ export default function Home() {
           </LightBox>
           <LightBox>
             <BoxTitle>Balance:</BoxTitle>
-            <BoxValue>{commaNumber(balance)} FLIP</BoxValue>
+            <BoxValue>{commaNumber(balance)} MSPACE</BoxValue>
             <BoxDollars>${commaNumber(balanceInUsd)}</BoxDollars>
           </LightBox>
           <LightBox>
@@ -320,7 +398,7 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full">
           <LightBox highlight={true}>
             <BoxTitle>Total Betting Volume:</BoxTitle>
-            <BoxValue>{commaNumber(totalBettingVolume)} FLIP</BoxValue>
+            <BoxValue>{commaNumber(totalBettingVolume)} MSPACE</BoxValue>
             <BoxDollars>${commaNumber(totalBettingVolumeInUsd)}</BoxDollars>
           </LightBox>
           <LightBox highlight={true}>
@@ -330,7 +408,9 @@ export default function Home() {
           </LightBox>
           <LightBox highlight={true}>
             <BoxTitle>Max Transaction Amount:</BoxTitle>
-            <BoxValue>{commaNumber(maxTx)} FLIP</BoxValue>
+            <BoxValue>
+              {convertToInternationalCurrencySystem(Number(maxTx))} MSPACE
+            </BoxValue>
           </LightBox>
         </div>
         <div className="h-10 mt-8 flex text-2xl text-accentdark w-full justify-center space-x-5">
@@ -351,7 +431,7 @@ export default function Home() {
             smol={true}
           />
         </div>
-        <div className="mt-3 flex flex-col items-center justify-center w-full h-full text-black font-title tracking-wide">
+        <div className="mt-3 flex flex-col items-center justify-center w-full h-full text-black font-body tracking-wide">
           <div className="text-center text-gray-300 text-[15px] font-normal">
             Contact{" "}
             <a
