@@ -17,7 +17,11 @@ export interface PricingData {
     totalBettingVolumeInUsd: string,  
     maxTx: string, 
     buybackBalance: number, 
-    buybackBalanceInUsd: string
+    buybackBalanceInUsd: string, 
+    buyFee: number, 
+    sellFee: number, 
+    gameTokens: string, 
+    // swapThreshold: string
 }
 
 export interface TokenToUsd {
@@ -25,8 +29,8 @@ export interface TokenToUsd {
     symbol: string
 }
 
-export const tokenAddress = '0x4Fb431848e8d36978c3Ab89c5A2140F877fd155C';
-export const LpTokenAddress = '0xe85132db5FED97dbB1Fce7E397B4FA1B0b82cB64';
+export const tokenAddress = '0xb8CED2c93584C4e228Df25a88dcBe346DF89525D';
+export const LpTokenAddress = '0xd0a2976740748da08073777e4b07817bcbdaf4bc';
 export const dividendTrackerAddress = '0x2399b0981b0a0f95c50d88361aaf25a60422b516'; 
 export const rewardsSymbol = 'BUSD';
 export const rewardsDecimals = 18;

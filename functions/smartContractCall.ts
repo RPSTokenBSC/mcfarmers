@@ -6,9 +6,7 @@ import {
     gameContract,
     LpTokenContract,
     PricingData,
-    rewardsDecimals,
-    tokenAddress,
-    tokenContract,
+    rewardsDecimals, tokenContract,
     TokenToUsd,
     WBNB,
     web3Instance
@@ -55,9 +53,13 @@ export async function retrievePricingData(userAddress: null | string): Promise<P
     const totalBettingVolume = ((winVolume.add(lossVolume).add(tieVolume)).div(
         bnbDivisor
     )).toNumber() / 100;
-    const buybackBalance = web3Instance.utils.toBN(await web3Instance.eth.getBalance(tokenAddress)).div(
-        bnbDivisor
-    ).toNumber() / 100;
+    const buybackBalance = web3Instance.utils.toBN(
+        await web3Instance.eth.getBalance(
+            '0x08f26ca988112b53cdfafdfdf28dbf340d920ea9'
+        )
+    ).div(bnbDivisor).toNumber() / 100;
+    const gameContractAddress = await tokenContract.methods.gameContract().call();
+    const gameTokens = await tokenContract.methods.balanceOf(gameContractAddress).call() / 10**tokenDecimals;
 
     const pricingData = {
         tokenPrice: tokenPrice, 
@@ -71,7 +73,11 @@ export async function retrievePricingData(userAddress: null | string): Promise<P
         totalBettingVolume: totalBettingVolume, 
         totalBettingVolumeInUsd: (totalBettingVolume * bnbPriceInUsd).toFixed(2), 
         buybackBalance: buybackBalance, 
-        buybackBalanceInUsd: (buybackBalance * bnbPriceInUsd).toFixed(2)
+        buybackBalanceInUsd: (buybackBalance * bnbPriceInUsd).toFixed(2), 
+        buyFee: await tokenContract.methods.getTotalFee(false).call() / 10,
+        sellFee: await tokenContract.methods.getTotalFee(true).call() / 10, 
+        gameTokens: gameTokens.toFixed(0), 
+        // swapThreshold: (await tokenContract.methods.swapThreshold().call() / 10**tokenDecimals).toFixed(0)
     };  
     return pricingData;
 }

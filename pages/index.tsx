@@ -1,15 +1,15 @@
 import { faTelegramPlane, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { faLink, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLink } from "@fortawesome/free-solid-svg-icons";
 import commaNumber from "comma-number";
 import Head from "next/head";
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import BoxDollars from "../components/BoxDollars";
 import BoxTitle from "../components/BoxTitle";
 import BoxValue from "../components/BoxValue";
 import Button from "../components/Button";
 import LightBox from "../components/LightBox";
 import Social from "../components/Social";
+import { claimDividends } from "../functions/claimDividends";
 import { web3Instance } from "../functions/config";
 import { retrievePricingData } from "../functions/smartContractCall";
 import { CustomWindow } from "../types/window";
@@ -86,11 +86,44 @@ export default function Home() {
   const [totalRewardsDistributed, setTotalRewardsDistributed] = useState("0");
   const [buybackBalance, setBuybackBalance] = useState(0);
   const [buyBackBalanceInUsd, setBuyBackBalanceInUsd] = useState("0");
+  const [isTxProcessing, setIsTxProcessing] = useState(false);
+  const [buyFee, setBuyFee] = useState(0);
+  const [sellFee, setSellFee] = useState(0);
+  const [gameTokens, setGameTokens] = useState('0');
+  // const [swapThreshold, setSwapThreshold] = useState('0');
 
   // ------------ FUNCTIONS ------------- //
   // function getPrice(amount: number) {
   //   return (amount * price).toFixed(2);
   // }
+
+  async function refreshData(address: string){
+    try{
+      setIsLoading(true);
+      const pricingData = await retrievePricingData(
+        isAddress(address) ? address : null
+      );
+      console.log('pricingData = ', pricingData);
+      setIsLoading(false);
+      setPrice(pricingData.tokenPrice);
+      setCirculatingSupply(pricingData.circulatingSupply);
+      setMarketCap(pricingData.marketCap);
+      setTotalBettingVolume(pricingData.totalBettingVolume);
+      setTotalBettingVolumeInUsd(pricingData.totalBettingVolumeInUsd);
+      setMaxTx(pricingData.maxTx);
+      setBuyFee(pricingData.buyFee);
+      setSellFee(pricingData.sellFee);
+      setGameTokens(pricingData.gameTokens);
+      // setSwapThreshold(pricingData.swapThreshold)
+      setBuybackBalance(pricingData.buybackBalance);
+      setBuyBackBalanceInUsd(pricingData.buybackBalanceInUsd);
+      setBalance(pricingData.holdersBalance);
+      setBalanceInUsd(pricingData.holdersBalanceInUsd);
+      setUnclaimedRewards(pricingData.unpaidRewards);
+    } catch(error){
+      alert("Error in retrieving smart contract data: " + error + '\nPlease refresh the page.');
+    }
+  }
   function triggerInfoLoad() {
     setInfoLoadTrigger(infoLoadTrigger ? 0 : 1);
   }
@@ -103,13 +136,13 @@ export default function Home() {
     }
   }
 
-  function handleAccountsChanged(accounts: string[]) {
+  async function handleAccountsChanged(accounts: string[]) {
     if (accounts.length === 0) {
       // MetaMask is locked or the user has not connected any accounts
       alert("Please connect to MetaMask.");
     } else if (accounts[0] !== connectedAddress) {
       setConnectedAddress(accounts[0]);
-      // Do any other work!
+      await refreshData(accounts[0]);
     }
   }
 
@@ -117,25 +150,26 @@ export default function Home() {
 
   useEffect(() => {
     async function loadData() {
-      const address = window.localStorage.getItem("preferredAddress");
-
-      const pricingData = await retrievePricingData(
-        isAddress(address) ? address : null
-      );
-      setIsLoading(false);
-      setPrice(pricingData.tokenPrice);
-      setCirculatingSupply(pricingData.circulatingSupply);
-      setMarketCap(pricingData.marketCap);
-      setTotalBettingVolume(pricingData.totalBettingVolume);
-      setTotalBettingVolumeInUsd(pricingData.totalBettingVolumeInUsd);
-      setMaxTx(pricingData.maxTx);
-      setTotalRewardsDistributed(pricingData.totalRewards);
-      setBuybackBalance(pricingData.buybackBalance);
-      setBuyBackBalanceInUsd(pricingData.buybackBalanceInUsd);
-      setBalance(pricingData.holdersBalance);
-      setBalanceInUsd(pricingData.holdersBalanceInUsd);
-      setBuyBackBalanceInUsd(pricingData.holdersBalanceInUsd);
-      setUnclaimedRewards(pricingData.unpaidRewards);
+      const ethereum = (window as unknown as CustomWindow).ethereum;
+      if (ethereum) {
+        ethereum.on("accountsChanged", handleAccountsChanged);
+        const chainId = await ethereum.request({ method: "eth_chainId" });
+        if (chainId !== "0x38") {
+          ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0x38" }],
+          });
+        }
+        const address = await logInWithMetamask(
+          () => {}, 
+          () => {}, 
+          setConnectedAddress
+        );
+        
+        await refreshData(address);
+      } else{
+        alert("Please install metamask");
+      }
     }
 
     loadData();
@@ -143,35 +177,40 @@ export default function Home() {
   }, [infoLoadTrigger]);
 
   // ------------ ON CLICK ------------- //
-  async function handleBscAddress(ref: MutableRefObject<any>) {
-    triggerInfoLoad();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    const address = ref.current?.value;
-    if (!isAddress(address)) {
-      alert("Invalid address. Please try again.");
-      return;
+  // async function handleBscAddress(ref: MutableRefObject<any>) {
+  //   triggerInfoLoad();
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  //   const address = ref.current?.value;
+  //   if (!isAddress(address)) {
+  //     alert("Invalid address. Please try again.");
+  //     return;
+  //   }
+  //   setIsLoading(true);
+  //   window.localStorage.setItem("preferredAddress", ref.current?.value);
+
+  //   const pricingData = await retrievePricingData(address);
+  //   setIsLoading(false);
+  //   setPrice(pricingData.tokenPrice);
+  //   setCirculatingSupply(pricingData.circulatingSupply);
+  //   setMarketCap(pricingData.marketCap);
+  //   setTotalBettingVolume(pricingData.totalBettingVolume);
+  //   setTotalBettingVolumeInUsd(pricingData.totalBettingVolumeInUsd);
+  //   setMaxTx(pricingData.maxTx);
+  //   setTotalRewardsDistributed(pricingData.totalRewards);
+  //   setBalance(pricingData.holdersBalance);
+  //   setBalanceInUsd(pricingData.holdersBalanceInUsd);
+  //   setUnclaimedRewards(pricingData.unpaidRewards);
+  //   return;
+  // }
+
+  async function handleClaimDividend() {
+    if(!isAddress(connectedAddress)){
+      alert("Please connect your wallet");
     }
-    setIsLoading(true);
-    window.localStorage.setItem("preferredAddress", ref.current?.value);
-
-    const pricingData = await retrievePricingData(address);
-    setIsLoading(false);
-    setPrice(pricingData.tokenPrice);
-    setCirculatingSupply(pricingData.circulatingSupply);
-    setMarketCap(pricingData.marketCap);
-    setTotalBettingVolume(pricingData.totalBettingVolume);
-    setTotalBettingVolumeInUsd(pricingData.totalBettingVolumeInUsd);
-    setMaxTx(pricingData.maxTx);
-    setTotalRewardsDistributed(pricingData.totalRewards);
-    setBalance(pricingData.holdersBalance);
-    setBalanceInUsd(pricingData.holdersBalanceInUsd);
-    setUnclaimedRewards(pricingData.unpaidRewards);
-    return;
-  }
-
-  function handleClaimDividend() {
+    setIsTxProcessing(true);
+    const success = await claimDividends(connectedAddress);
+    setIsTxProcessing(false);
     triggerInfoLoad();
-    alert("This feature will be added shortly");
   }
 
   function handleConnect() {
@@ -205,7 +244,7 @@ export default function Home() {
       >
         <img
           src="/loading.svg"
-          alt="Loading SVG for NanoShiba token dashboard on BSC"
+          alt="Loading SVG for MetaSpace token dashboard on BSC"
         />
         <div className="text-2xl text-white font-medium tracking-wide font-title">
           Connecting to blockchain...
@@ -306,25 +345,13 @@ export default function Home() {
           {" "}
           {connectedAddress ? shortenAddress(connectedAddress) : "Connect"}{" "}
         </Button>
-        <a href="https://www.flipperstoken.com/" target="_blank">
+        <a href="https://metaspacemoon.com/" target="_blank">
           <img
             src="/assets/metalogo2.png"
             alt="MetaSpace Gaming (MSPACE) Logo"
-            className="w-64 xs:w-96 mt-10 mb-3"
+            className="w-64 xs:w-96 mt-10 mb-5"
           />
         </a>
-        <div className="flex items-center max-w-xl w-full  mt-5 border-red-500">
-          {/* Input to search BSC address */}
-          <input
-            ref={bscAddress}
-            className="w-full brightness-110 bg-[#242D44] border-accentdark text-white px-5 h-10 mr-4 text-lg font-normal tracking-wide text-gray-800 border-2 border-gray-500 rounded-lg focus:outline-none focus:border-red-500 font-title"
-            type="text"
-            placeholder="Enter BSC address"
-          />
-          <Button onClick={() => handleBscAddress(bscAddress)}>
-            <FontAwesomeIcon icon={faSearch} className="text-white h-6 w-6" />
-          </Button>
-        </div>
         <div className="flex flex-col lg:flex-row mt-10 space-x-0 space-y-1 lg:space-y-0 lg:space-x-5 font-semibold w-full text-white">
           <div className="bg-elevatedbg rounded-md px-5 py-3 w-full flex flex-wrap md:justify-start justify-between text-dollars font-medium font-title text-lg tracking-wide">
             <span className="text-accentdark font-normal">Price:&nbsp;</span>$
@@ -348,11 +375,11 @@ export default function Home() {
         </div>
         <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full">
           <LightBox>
-            <BoxTitle>Unclaimed rewards:</BoxTitle>{" "}
-            <BoxValue>{commaNumber(unclaimedRewards)} BUSD</BoxValue>
-            <Button onClick={handleClaimDividend} className="mt-2">
-              Claim dividend
-            </Button>
+            <BoxTitle>Game Tokens:</BoxTitle>{" "}
+            <BoxValue>{commaNumber(gameTokens)} MSPACE</BoxValue>
+            {/* <Button onClick={handleClaimDividend} className="mt-2">
+              { isTxProcessing? "Processing...": "Claim Dividend" }
+            </Button> */}
           </LightBox>
           <LightBox>
             <BoxTitle>Balance:</BoxTitle>
@@ -360,18 +387,17 @@ export default function Home() {
             <BoxDollars>${commaNumber(balanceInUsd)}</BoxDollars>
           </LightBox>
           <LightBox>
-            <BoxTitle>Total Rewards Distributed:</BoxTitle>{" "}
-            <BoxValue>{commaNumber(totalRewardsDistributed)} BUSD</BoxValue>
+            <BoxTitle>Buy fee:</BoxTitle>{" "}
+            <BoxValue>{buyFee} %</BoxValue>
           </LightBox>
         </div>
         <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full">
           <LightBox highlight={true}>
-            <BoxTitle>Total Betting Volume:</BoxTitle>
-            <BoxValue>{commaNumber(totalBettingVolume)} MSPACE</BoxValue>
-            <BoxDollars>${commaNumber(totalBettingVolumeInUsd)}</BoxDollars>
+            <BoxTitle>Sell fee:</BoxTitle>
+            <BoxValue>{sellFee} %</BoxValue>
           </LightBox>
           <LightBox highlight={true}>
-            <BoxTitle>Buyback balance:</BoxTitle>
+            <BoxTitle>Marketing Wallet Balance:</BoxTitle>
             <BoxValue>{commaNumber(buybackBalance)} BNB</BoxValue>
             <BoxDollars>${commaNumber(buyBackBalanceInUsd)}</BoxDollars>
           </LightBox>
@@ -386,17 +412,17 @@ export default function Home() {
           <Social
             icon={faTwitter}
             link={"https://twitter.com/MetaspaceGaming"}
-            name="Flippers Twitter Link"
+            name="MetaSpace Twitter Link"
           />
           <Social
             icon={faTelegramPlane}
             link={"https://t.me/MetaspaceGaming"}
-            name="Flippers Telegram Link"
+            name="MetaSpace Telegram Link"
           />
           <Social
             icon={faLink}
             link={"https://metaspacemoon.com/"}
-            name="Flippers Website Link"
+            name="MetaSpace Website Link"
             smol={true}
           />
         </div>
