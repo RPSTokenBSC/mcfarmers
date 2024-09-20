@@ -4,8 +4,8 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     fontFamily: {
-      title: ["Kallisto", "sans-serif"],
-      body: ["Poppins", "sans-serif"],
+      title: ["Inter", "sans-serif"],
+      body: ["Inter", "sans-serif"],
     },
 
     screens: {
@@ -24,7 +24,10 @@ module.exports = {
       colors: {
         white: "#0C1633",
         aside: "#0C1633",
-        mainbg: "#EE82A1",
+        accent: "#ff3131",
+        accent2: "#ffea2f",
+        input: "#e7e7e7",
+        mainbg: "#97f9ff",
         elevatedbg: "#0C1633",
         cardbg: "#1e2026",
         secondaryText: "#B7BDC6",
@@ -41,7 +44,6 @@ module.exports = {
         accentsecondary: "#0051F6",
         lightbg: "#BABFC5",
         lighterbg: "#FFFFFF",
-        accent: "#F08B0C",
         pinkWhite: "#0C1633",
         progressDark: "#C49CB7",
         progressLight: "#EE82A1",
@@ -52,7 +54,7 @@ module.exports = {
         asideSecondaryDark: "#4B72B6",
         asideSecondaryLight: "#8084A5",
         main: "#151928",
-        black: "#30568C",
+        // black: "#30568C",
         gray: "#555",
         bk: "#000",
         white: "#FFF",
