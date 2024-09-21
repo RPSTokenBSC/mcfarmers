@@ -1,5 +1,4 @@
 import { faTelegramPlane, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { faLink } from "@fortawesome/free-solid-svg-icons";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import ReferralBox from "../components/ReferralBox";
@@ -60,24 +59,24 @@ export default function Home() {
 
           {/* Show ReferralBox with Connect Wallet button */}
           <ReferralBox onConnect={connectWallet} />
-          {/* <div className="h-10 mt-32 flex text-2xl text-accent2 w-full justify-center space-x-5">
+          <div className="h-10 mt-32 flex text-2xl text-accent2 w-full justify-center space-x-5">
             <Social
               icon={faTwitter}
-              link={"https://twitter.com/MetaspaceGaming"}
+              link={"https://twitter.com/mcfarmereth"}
               name="MetaSpace Twitter Link"
             />
             <Social
               icon={faTelegramPlane}
-              link={"https://t.me/MetaspaceGaming"}
+              link={"https://t.me/McFarmers"}
               name="MetaSpace Telegram Link"
             />
-            <Social
+            {/* <Social
               icon={faLink}
               link={"https://metaspacemoon.com/"}
               name="MetaSpace Website Link"
               smol={true}
-            />
-          </div> */}
+            /> */}
+          </div>
         </div>
       </div>
     );
@@ -113,20 +112,20 @@ export default function Home() {
         <div className="h-10 mt-32 flex text-2xl text-accent2 w-full justify-center space-x-5">
           <Social
             icon={faTwitter}
-            link={"https://twitter.com/MetaspaceGaming"}
+            link={"https://twitter.com/mcfarmereth"}
             name="MetaSpace Twitter Link"
           />
           <Social
             icon={faTelegramPlane}
-            link={"https://t.me/MetaspaceGaming"}
+            link={"https://t.me/McFarmers"}
             name="MetaSpace Telegram Link"
           />
-          <Social
+          {/* <Social
             icon={faLink}
             link={"https://metaspacemoon.com/"}
             name="MetaSpace Website Link"
             smol={true}
-          />
+          /> */}
         </div>
       </div>
     </div>

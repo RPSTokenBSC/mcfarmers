@@ -3,7 +3,7 @@ import EditableInput from "./EditableInput";
 
 interface ReferralTableRowProps {
   referral: {
-    id: number;
+    _id: string;
     walletAddress: string;
     telegramUsername: string;
     referrerUsername: string;
@@ -26,7 +26,7 @@ const ReferralTableRow = ({
   isAdmin,
 }: ReferralTableRowProps) => (
   <tr>
-    <td className="border border-gray-300 px-4 py-2">{referral.id}</td>
+    <td className="border border-gray-300 px-4 py-2">{referral._id}</td>
     <td className="border border-gray-300 px-4 py-2">
       <EditableInput
         value={referral.walletAddress}

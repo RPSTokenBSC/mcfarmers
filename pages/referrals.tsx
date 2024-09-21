@@ -5,7 +5,7 @@ import { useConnectAddress } from "../hooks/useConnectedAddress";
 import { useReferralStore } from "../store/referralStore";
 
 interface Referral {
-  id: number;
+  _id: string;
   walletAddress: string;
   telegramUsername: string;
   referrerUsername: string;
@@ -14,7 +14,7 @@ interface Referral {
 export default function ReferralsPage() {
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingReferralId, setEditingReferralId] = useState<number | null>(
+  const [editingReferralId, setEditingReferralId] = useState<string | null>(
     null
   );
 
@@ -40,13 +40,13 @@ export default function ReferralsPage() {
     }
   }, [isAdmin]); // Only fetch referrals if the user is an admin
 
-  const handleEdit = (id: number) => {
+  const handleEdit = (id: string) => {
     setEditingReferralId(id);
   };
 
   const handleSave = async (referral: Referral) => {
     try {
-      const response = await fetch(`/api/referrals/${referral.id}`, {
+      const response = await fetch(`/api/referrals/${referral._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -64,14 +64,14 @@ export default function ReferralsPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
       const response = await fetch(`/api/referrals/${id}`, {
         method: "DELETE",
       });
       if (response.ok) {
         alert("Referral deleted successfully!");
-        setReferrals(referrals.filter((referral) => referral.id !== id)); // Remove deleted referral from state
+        setReferrals(referrals.filter((referral) => referral._id !== id)); // Remove deleted referral from state
       } else {
         alert("Error deleting referral");
       }
@@ -80,10 +80,10 @@ export default function ReferralsPage() {
     }
   };
 
-  const handleFieldChange = (id: number, field: string, value: string) => {
+  const handleFieldChange = (id: string, field: string, value: string) => {
     setReferrals((prevReferrals) =>
       prevReferrals.map((referral) =>
-        referral.id === id ? { ...referral, [field]: value } : referral
+        referral._id === id ? { ...referral, [field]: value } : referral
       )
     );
   };
@@ -147,20 +147,23 @@ export default function ReferralsPage() {
           </tr>
         </thead>
         <tbody>
-          {referrals.map((referral) => (
-            <ReferralTableRow
-              key={referral.id}
-              referral={referral}
-              isEditing={editingReferralId === referral.id}
-              onEdit={() => handleEdit(referral.id)}
-              onSave={() => handleSave(referral)}
-              onDelete={() => handleDelete(referral.id)}
-              onFieldChange={(field, value) =>
-                handleFieldChange(referral.id, field, value)
-              }
-              isAdmin={isAdmin}
-            />
-          ))}
+          {referrals.map((referral) => {
+            console.log({ referral });
+            return (
+              <ReferralTableRow
+                key={referral._id}
+                referral={referral}
+                isEditing={editingReferralId === referral._id}
+                onEdit={() => handleEdit(referral._id)}
+                onSave={() => handleSave(referral)}
+                onDelete={() => handleDelete(referral._id)}
+                onFieldChange={(field, value) =>
+                  handleFieldChange(referral._id, field, value)
+                }
+                isAdmin={isAdmin}
+              />
+            );
+          })}
         </tbody>
       </table>
     </div>

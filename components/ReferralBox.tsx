@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { FaCheck, FaPencilAlt } from "react-icons/fa"; // Import pencil and check icons
 import { useReferralStore } from "../store/referralStore";
 import handleConnect from "../utils/handleConnect";
@@ -118,13 +119,24 @@ export default function ReferralBox({ onConnect }: { onConnect?: () => void }) {
     setReferrerUsername,
   } = useReferralStore();
 
-  // Local state for editing mode, validation, and submission
+  const router = useRouter();
   const [isEditingYourUsername, setIsEditingYourUsername] = useState(false);
   const [isEditingReferrerUsername, setIsEditingReferrerUsername] =
     useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isValidUsername, setIsValidUsername] = useState(true);
   const [isValidReferrer, setIsValidReferrer] = useState(true);
+
+  // Handle URL query for referral
+  useEffect(() => {
+    if (router.query.r) {
+      const referrer = autoAddAt(router.query.r as string);
+      if (validateTelegramUsername(referrer)) {
+        setReferrerUsername(referrer); // Set valid referrer from URL
+        setIsValidReferrer(true);
+      }
+    }
+  }, [router.query.r, setReferrerUsername]);
 
   // Handlers for connecting the wallet and editing usernames
   const handleConnectWallet = async () => {
@@ -141,7 +153,7 @@ export default function ReferralBox({ onConnect }: { onConnect?: () => void }) {
   ) => {
     const value = autoAddAt(e.target.value);
     setTelegramUsername(value);
-    setIsValidUsername(validateTelegramUsername(value));
+    setIsValidUsername(validateTelegramUsername(value) || !value); // Valid or empty
   };
 
   const handleReferrerUsernameChange = (
@@ -154,7 +166,7 @@ export default function ReferralBox({ onConnect }: { onConnect?: () => void }) {
 
   // Submit the form and check if the wallet has already submitted
   const handleSubmit = async () => {
-    if (!connectedAddress || !isValidUsername || !isValidReferrer) {
+    if (!connectedAddress || !isValidReferrer) {
       alert("Please ensure all fields are valid before submitting.");
       return;
     }
@@ -272,7 +284,7 @@ export default function ReferralBox({ onConnect }: { onConnect?: () => void }) {
             {/* Submit Button */}
             <SubmitButton
               onClick={handleSubmit}
-              isDisabled={!isValidUsername || !isValidReferrer}
+              isDisabled={!isValidReferrer}
             />
           </>
         )}

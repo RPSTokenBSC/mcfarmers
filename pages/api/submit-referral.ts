@@ -11,8 +11,14 @@ export default async function handler(
 
   const { walletAddress, telegramUsername, referrerUsername } = req.body;
 
-  if (!walletAddress || !telegramUsername || !referrerUsername) {
-    return res.status(400).json({ message: "All fields are required" });
+  // if (!walletAddress || !referrerUsername) {
+  //   return res.status(400).json({ message: "Wallet" });
+  // }
+  if (!walletAddress) {
+    return res.status(400).json({ message: "Wallet address is required" });
+  }
+  if (!referrerUsername) {
+    return res.status(400).json({ message: "Referrer username is required" });
   }
 
   try {
@@ -31,7 +37,7 @@ export default async function handler(
     // Insert the referral data
     const result = await db.collection("referrals").insertOne({
       walletAddress,
-      telegramUsername,
+      telegramUsername: telegramUsername || "",
       referrerUsername,
     });
 
