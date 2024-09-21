@@ -86,8 +86,67 @@ export default function ReferredBox() {
           label="Referrer Username"
           value={referralDetails.referrerUsername || "Not set"}
         />
+        {/* Referral Code Section */}
+        {referralDetails.telegramUsername &&
+          typeof referralDetails.telegramUsername === "string" &&
+          referralDetails.telegramUsername.length > 0 && (
+            <div className="mt-4">
+              {/* Referral Code Section */}
+              {referralDetails.telegramUsername &&
+                typeof referralDetails.telegramUsername === "string" &&
+                referralDetails.telegramUsername.length > 0 && (
+                  <div className="mt-4">
+                    {/* <div className="flex justify-between text-sm text-black">
+                      <div>Referral Code</div>
+                      <div className="text-gray-500">#XYZ123</div>
+                    </div> */}
+                    <div className="flex w-full">
+                      <div
+                        className="bg-input rounded-l-md mt-2 p-2 text-black text-center w-full"
+                        onClick={(e) => {
+                          const target = e.currentTarget as HTMLDivElement;
+                          const input = target.querySelector(
+                            "input"
+                          ) as HTMLInputElement;
+                          input.select();
+                        }}
+                      >
+                        <input
+                          type="text"
+                          value={`https://mcfarmers.io/?r=${referralDetails.telegramUsername}`}
+                          readOnly
+                          className="w-full outline-none bg-input text-black text-center"
+                          onClick={(e) => {
+                            const target = e.currentTarget as HTMLInputElement;
+                            target.select();
+                          }}
+                        />
+                      </div>
+                      <div
+                        className="bg-accent rounded-r-md mt-2 px-4 flex items-center font-bold text-accent2 cursor-pointer select-none text-center"
+                        onClick={(e) => {
+                          const target = e.currentTarget as HTMLDivElement;
+                          const input =
+                            target.previousElementSibling.querySelector(
+                              "input"
+                            ) as HTMLInputElement;
+                          input.select();
+                          const success = document.execCommand("copy");
+                          if (success) {
+                            alert("Copied to clipboard!");
+                          }
+                          // deselect the input
+                          input.blur();
+                        }}
+                      >
+                        Copy
+                      </div>
+                    </div>
+                  </div>
+                )}
+            </div>
+          )}
 
-        {/* Status Message */}
         <div className="mt-4 text-center text-gray-500">
           Yup, you've already submitted your referral information.
         </div>
