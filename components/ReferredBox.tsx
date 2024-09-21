@@ -149,7 +149,8 @@ export default function ReferredBox() {
           )}
 
         <div className="mt-4 text-center text-gray-500">
-          Yup, you've already submitted your referral information.
+          You've submitted your referral information, use this link to gain
+          referalls of your own.
         </div>
       </div>
     </div>
