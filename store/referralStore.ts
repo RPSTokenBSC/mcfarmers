@@ -11,7 +11,10 @@ interface ReferralState {
   checkAdminStatus: (address: string | null) => void;
 }
 
-const adminAddresses = ["0x83abeafe7ba5be9b173149603e13550dcc2ffe57"];
+const adminAddresses = [
+  "0x83abeafe7ba5be9b173149603e13550dcc2ffe57",
+  "0x850AA5690d767E03d9e4C9e49f910F840Caf61f3",
+];
 
 export const useReferralStore = create<ReferralState>((set) => ({
   connectedAddress: null,
