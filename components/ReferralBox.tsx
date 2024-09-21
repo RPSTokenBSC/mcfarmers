@@ -2,26 +2,40 @@ import Image from "next/image";
 import { useState } from "react";
 import { FaPencilAlt } from "react-icons/fa"; // Import pencil icon
 import { useReferralStore } from "../store/referralStore";
+import handleConnect from "../utils/handleConnect";
+import { semiShortenAddress } from "../utils/semiShortenAddress";
+import ReferredBox from "./ReferredBox"; // Import ReferredBox
 
-// Reusable Label-Value Component with Edit/Add functionality
-const LabelValueEditable = ({
+// Reusable Editable Input Component
+const EditableInput = ({
   label,
   value,
-  isEditable,
-  onEdit,
+  isEditing,
+  onChange,
+  onEditToggle,
 }: {
   label: string;
   value: string;
-  isEditable: boolean;
-  onEdit: () => void;
+  isEditing: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onEditToggle: () => void;
 }) => (
   <div className="mt-4">
     <div className="flex justify-between items-center text-black">
       <div>{label}</div>
       <div className="text-gray-500 flex items-center">
-        {value ? value : "Not set"}
-        <button className="ml-2 text-accent" onClick={onEdit}>
-          {isEditable ? <FaPencilAlt /> : "Add"}
+        {isEditing ? (
+          <input
+            type="text"
+            value={value}
+            onChange={onChange}
+            className="border border-gray-300 rounded-md px-2 py-1"
+          />
+        ) : (
+          value || "Not set"
+        )}
+        <button className="ml-2 text-accent" onClick={onEditToggle}>
+          <FaPencilAlt />
         </button>
       </div>
     </div>
@@ -48,7 +62,7 @@ const SubmitButton = ({ onClick }: { onClick: () => void }) => (
   </button>
 );
 
-export default function ReferralBox() {
+export default function ReferralBox({ onConnect }: { onConnect?: () => void }) {
   const {
     connectedAddress,
     setConnectedAddress,
@@ -58,55 +72,61 @@ export default function ReferralBox() {
     setReferrerUsername,
   } = useReferralStore();
 
-  // Local state to handle editing for Telegram usernames
+  // Local state for editing mode and submission
   const [isEditingYourUsername, setIsEditingYourUsername] = useState(false);
   const [isEditingReferrerUsername, setIsEditingReferrerUsername] =
     useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false); // Tracks submission state
 
   // Handlers for connecting the wallet and editing usernames
-  const handleConnectWallet = () => {
-    // Logic to connect wallet (MetaMask, etc.)
-    console.log("Connect Wallet triggered");
-    setConnectedAddress("0x123...abc"); // Simulating connected wallet
-  };
-
-  const handleEditTelegramUsername = () => {
-    if (isEditingYourUsername) {
-      // Save logic here (e.g., open modal or input to get new username)
-      const newUsername = prompt(
-        "Enter your Telegram username:",
-        telegramUsername || ""
-      );
-      if (newUsername) {
-        setTelegramUsername(newUsername);
-      }
+  const handleConnectWallet = async () => {
+    if (onConnect) {
+      onConnect(); // Propagate the wallet connection logic from the parent if passed
+    } else {
+      handleConnect(setConnectedAddress); // Default handling logic
     }
-    setIsEditingYourUsername(!isEditingYourUsername);
   };
 
-  const handleEditReferrerUsername = () => {
-    if (isEditingReferrerUsername) {
-      // Save logic here (e.g., open modal or input to get referrer username)
-      const newReferrer = prompt(
-        "Enter referrer Telegram username:",
-        referrerUsername || ""
-      );
-      if (newReferrer) {
-        setReferrerUsername(newReferrer);
-      }
+  // Submit the form and switch to ReferredBox after success
+  const handleSubmit = async () => {
+    if (!connectedAddress || !telegramUsername || !referrerUsername) {
+      alert("All fields are required.");
+      return;
     }
-    setIsEditingReferrerUsername(!isEditingReferrerUsername);
-  };
 
-  const handleSubmit = () => {
-    console.log("Referral details submitted");
-    console.log({
+    const referralData = {
       walletAddress: connectedAddress,
       telegramUsername,
       referrerUsername,
-    });
-    // Add logic to submit or validate the referral data
+    };
+
+    try {
+      const response = await fetch("/api/submit-referral", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(referralData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setIsSubmitted(true); // Mark submission as successful
+        console.log("Referral submitted successfully!", result);
+      } else {
+        alert(`Error: ${result.message}`);
+      }
+    } catch (error) {
+      alert("An error occurred while submitting the referral.");
+      console.error("Error:", error);
+    }
   };
+
+  // If submitted, render ReferredBox
+  if (isSubmitted) {
+    return <ReferredBox />;
+  }
 
   return (
     <div className="rounded-lg shadow-lg w-full max-w-md">
@@ -133,7 +153,9 @@ export default function ReferralBox() {
           <div className="flex justify-between items-center text-black">
             <div>Wallet Address</div>
             <div className="text-gray-500">
-              {connectedAddress ? connectedAddress : "Not connected"}
+              {connectedAddress
+                ? semiShortenAddress(connectedAddress)
+                : "Not connected"}
             </div>
           </div>
           {!connectedAddress && (
@@ -142,19 +164,23 @@ export default function ReferralBox() {
         </div>
 
         {/* Your Telegram Username (Editable) */}
-        <LabelValueEditable
+        <EditableInput
           label="Your Telegram Username"
           value={telegramUsername || ""}
-          isEditable={telegramUsername !== ""}
-          onEdit={handleEditTelegramUsername}
+          isEditing={isEditingYourUsername}
+          onChange={(e) => setTelegramUsername(e.target.value)}
+          onEditToggle={() => setIsEditingYourUsername(!isEditingYourUsername)}
         />
 
         {/* Referrer Username (Editable) */}
-        <LabelValueEditable
+        <EditableInput
           label="Referrer Username"
           value={referrerUsername || ""}
-          isEditable={referrerUsername !== ""}
-          onEdit={handleEditReferrerUsername}
+          isEditing={isEditingReferrerUsername}
+          onChange={(e) => setReferrerUsername(e.target.value)}
+          onEditToggle={() =>
+            setIsEditingReferrerUsername(!isEditingReferrerUsername)
+          }
         />
 
         {/* Submit Button */}

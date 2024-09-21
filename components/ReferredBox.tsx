@@ -1,5 +1,7 @@
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useReferralStore } from "../store/referralStore";
+
 const LabelValue = ({ label, value }: { label: string; value: string }) => (
   <div className="mt-4">
     <div className="flex justify-between text-sm text-black">
@@ -10,8 +12,45 @@ const LabelValue = ({ label, value }: { label: string; value: string }) => (
 );
 
 export default function ReferredBox() {
-  const { connectedAddress, telegramUsername, referrerUsername } =
-    useReferralStore();
+  const { connectedAddress } = useReferralStore();
+  const [referralDetails, setReferralDetails] = useState({
+    telegramUsername: "",
+    referrerUsername: "",
+  });
+  const [loading, setLoading] = useState(true);
+
+  // Fetch referral details for the connected wallet address
+  useEffect(() => {
+    const fetchReferralDetails = async () => {
+      if (connectedAddress) {
+        try {
+          const response = await fetch(`/api/referral/${connectedAddress}`);
+          const data = await response.json();
+
+          if (response.ok && data.referral) {
+            const { telegramUsername, referrerUsername } = data.referral;
+            setReferralDetails({ telegramUsername, referrerUsername });
+          } else {
+            console.log("No referral found for this address.");
+          }
+        } catch (error) {
+          console.error("Error fetching referral details:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchReferralDetails();
+  }, [connectedAddress]);
+
+  if (!connectedAddress) {
+    return <div>Please connect your wallet to see your referral details.</div>;
+  }
+
+  if (loading) {
+    return <div>Loading referral details...</div>;
+  }
 
   return (
     <div className="rounded-lg shadow-lg w-full max-w-md">
@@ -34,21 +73,18 @@ export default function ReferredBox() {
         </div>
 
         {/* Wallet Address */}
-        <LabelValue
-          label="Wallet Address"
-          value={connectedAddress || "Not connected"}
-        />
+        <LabelValue label="Wallet Address" value={connectedAddress} />
 
         {/* Your Telegram Username */}
         <LabelValue
           label="Your Telegram Username"
-          value={telegramUsername || "Not set"}
+          value={referralDetails.telegramUsername || "Not set"}
         />
 
         {/* Referrer Username */}
         <LabelValue
           label="Referrer Username"
-          value={referrerUsername || "Not set"}
+          value={referralDetails.referrerUsername || "Not set"}
         />
 
         {/* Status Message */}

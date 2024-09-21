@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface ReferralModalProps {
   isOpen: boolean;
   onClose: () => void;

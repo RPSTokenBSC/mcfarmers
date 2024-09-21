@@ -20,7 +20,7 @@ function shortenAddress(address: string) {
   return [firstPart, secondPart].join("...");
 }
 
-function semiShortenAddress(address: string) {
+export function semiShortenAddress(address: string) {
   const firstPart = address.slice(0, 2);
   const secondPart = address.slice(address.length - 12, address.length);
   return [firstPart, secondPart].join("...");
@@ -89,7 +89,7 @@ export default function Home() {
   const [isTxProcessing, setIsTxProcessing] = useState(false);
   const [buyFee, setBuyFee] = useState(0);
   const [sellFee, setSellFee] = useState(0);
-  const [gameTokens, setGameTokens] = useState('0');
+  const [gameTokens, setGameTokens] = useState("0");
   // const [swapThreshold, setSwapThreshold] = useState('0');
 
   // ------------ FUNCTIONS ------------- //
@@ -97,13 +97,13 @@ export default function Home() {
   //   return (amount * price).toFixed(2);
   // }
 
-  async function refreshData(address: string){
-    try{
+  async function refreshData(address: string) {
+    try {
       setIsLoading(true);
       const pricingData = await retrievePricingData(
         isAddress(address) ? address : null
       );
-      console.log('pricingData = ', pricingData);
+      console.log("pricingData = ", pricingData);
       setIsLoading(false);
       setPrice(pricingData.tokenPrice);
       setCirculatingSupply(pricingData.circulatingSupply);
@@ -120,8 +120,12 @@ export default function Home() {
       setBalance(pricingData.holdersBalance);
       setBalanceInUsd(pricingData.holdersBalanceInUsd);
       setUnclaimedRewards(pricingData.unpaidRewards);
-    } catch(error){
-      alert("Error in retrieving smart contract data: " + error + '\nPlease refresh the page.');
+    } catch (error) {
+      alert(
+        "Error in retrieving smart contract data: " +
+          error +
+          "\nPlease refresh the page."
+      );
     }
   }
   function triggerInfoLoad() {
@@ -161,13 +165,13 @@ export default function Home() {
           });
         }
         const address = await logInWithMetamask(
-          () => {}, 
-          () => {}, 
+          () => {},
+          () => {},
           setConnectedAddress
         );
-        
+
         await refreshData(address);
-      } else{
+      } else {
         alert("Please install metamask");
       }
     }
@@ -204,7 +208,7 @@ export default function Home() {
   // }
 
   async function handleClaimDividend() {
-    if(!isAddress(connectedAddress)){
+    if (!isAddress(connectedAddress)) {
       alert("Please connect your wallet");
     }
     setIsTxProcessing(true);
@@ -387,8 +391,7 @@ export default function Home() {
             <BoxDollars>${commaNumber(balanceInUsd)}</BoxDollars>
           </LightBox>
           <LightBox>
-            <BoxTitle>Buy fee:</BoxTitle>{" "}
-            <BoxValue>{buyFee} %</BoxValue>
+            <BoxTitle>Buy fee:</BoxTitle> <BoxValue>{buyFee} %</BoxValue>
           </LightBox>
         </div>
         <div className="flex flex-col lg:flex-row mt-5 space-x-0 space-y-5 lg:space-y-0 lg:space-x-5 w-full">
