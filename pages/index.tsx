@@ -60,7 +60,6 @@ export default function Home() {
 
           {/* Show ReferralBox with Connect Wallet button */}
           <ReferralBox onConnect={connectWallet} />
-
           {/* <div className="h-10 mt-32 flex text-2xl text-accent2 w-full justify-center space-x-5">
             <Social
               icon={faTwitter}
