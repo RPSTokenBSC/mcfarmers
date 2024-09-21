@@ -20,6 +20,10 @@ export default async function handler(
   if (!referrerUsername) {
     return res.status(400).json({ message: "Referrer username is required" });
   }
+  // no own username also
+  if (!telegramUsername) {
+    return res.status(400).json({ message: "Telegram username is required" });
+  }
 
   try {
     const client = await clientPromise;

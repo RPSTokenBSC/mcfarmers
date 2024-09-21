@@ -124,8 +124,8 @@ export default function ReferralBox({ onConnect }: { onConnect?: () => void }) {
   const [isEditingReferrerUsername, setIsEditingReferrerUsername] =
     useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isValidUsername, setIsValidUsername] = useState(true);
-  const [isValidReferrer, setIsValidReferrer] = useState(true);
+  const [isValidUsername, setIsValidUsername] = useState(false); // Default to false to enforce validation
+  const [isValidReferrer, setIsValidReferrer] = useState(true); // Allow for empty referrer initially
 
   // Handle URL query for referral
   useEffect(() => {
@@ -153,7 +153,7 @@ export default function ReferralBox({ onConnect }: { onConnect?: () => void }) {
   ) => {
     const value = autoAddAt(e.target.value);
     setTelegramUsername(value);
-    setIsValidUsername(validateTelegramUsername(value) || !value); // Valid or empty
+    setIsValidUsername(validateTelegramUsername(value)); // User's own username must be valid
   };
 
   const handleReferrerUsernameChange = (
@@ -166,7 +166,7 @@ export default function ReferralBox({ onConnect }: { onConnect?: () => void }) {
 
   // Submit the form and check if the wallet has already submitted
   const handleSubmit = async () => {
-    if (!connectedAddress || !isValidReferrer) {
+    if (!connectedAddress || !isValidReferrer || !isValidUsername) {
       alert("Please ensure all fields are valid before submitting.");
       return;
     }
@@ -284,7 +284,7 @@ export default function ReferralBox({ onConnect }: { onConnect?: () => void }) {
             {/* Submit Button */}
             <SubmitButton
               onClick={handleSubmit}
-              isDisabled={!isValidReferrer}
+              isDisabled={!isValidUsername || !isValidReferrer}
             />
           </>
         )}

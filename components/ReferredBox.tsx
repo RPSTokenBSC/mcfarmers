@@ -75,17 +75,18 @@ export default function ReferredBox() {
         {/* Wallet Address */}
         <LabelValue label="Wallet Address" value={connectedAddress} />
 
+        {/* Referrer Username */}
+        <LabelValue
+          label="Referrer Username"
+          value={referralDetails.referrerUsername || "Not set"}
+        />
+
         {/* Your Telegram Username */}
         <LabelValue
           label="Your Telegram Username"
           value={referralDetails.telegramUsername || "Not set"}
         />
 
-        {/* Referrer Username */}
-        <LabelValue
-          label="Referrer Username"
-          value={referralDetails.referrerUsername || "Not set"}
-        />
         {/* Referral Code Section */}
         {referralDetails.telegramUsername &&
           typeof referralDetails.telegramUsername === "string" &&
