@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { openDB } from "../../../lib/db";
+import clientPromise from "../../../lib/mongodb";
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,15 +11,12 @@ export default async function handler(
     return res.status(400).json({ message: "Wallet address is required" });
   }
 
-  const db = await openDB();
-
   try {
-    const referral = await db.get(
-      "SELECT * FROM referrals WHERE walletAddress = ?",
-      walletAddress
-    );
-
-    // referral type is { id: number, walletAddress: string, telegramUsername: string, referrerUsername: string }
+    const client = await clientPromise;
+    const db = client.db("yourDatabaseName");
+    const referral = await db
+      .collection("referrals")
+      .findOne({ walletAddress });
 
     if (referral) {
       return res.status(200).json({ referral });

@@ -1,6 +1,5 @@
-// pages/api/submit-referral.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { openDB } from "../../lib/db"; // Ensure correct import of openDB
+import clientPromise from "../../lib/mongodb";
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,28 +16,28 @@ export default async function handler(
   }
 
   try {
-    const db = await openDB();
+    const client = await clientPromise;
+    const db = client.db("yourDatabaseName");
 
-    // Ensure the table exists
-    await db.run(`
-      CREATE TABLE IF NOT EXISTS referrals (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        walletAddress TEXT,
-        telegramUsername TEXT,
-        referrerUsername TEXT
-      )
-    `);
+    // Check if referral already exists
+    const existingReferral = await db
+      .collection("referrals")
+      .findOne({ walletAddress });
+
+    if (existingReferral) {
+      return res.status(400).json({ message: "Referral already submitted." });
+    }
 
     // Insert the referral data
-    const result = await db.run(
-      `INSERT INTO referrals (walletAddress, telegramUsername, referrerUsername)
-       VALUES (?, ?, ?)`,
-      [walletAddress, telegramUsername, referrerUsername]
-    );
+    const result = await db.collection("referrals").insertOne({
+      walletAddress,
+      telegramUsername,
+      referrerUsername,
+    });
 
     res.status(200).json({
       message: "Referral submitted successfully",
-      referralId: result.lastID,
+      referralId: result.insertedId,
     });
   } catch (error) {
     res

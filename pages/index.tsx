@@ -51,7 +51,7 @@ export default function Home() {
           />
           {/* Other head elements */}
         </Head>
-        <div className="h-full w-full bg-accent rounded-xl shadow-lg px-5 pt-10 pb-4 flex flex-col items-center focus:border-red-500 relative">
+        <div className="h-full pb-32 w-full bg-accent rounded-xl shadow-lg px-5 pt-10 pb-4 flex flex-col items-center focus:border-red-500 relative">
           <img
             src="/McFarmers.png"
             alt="MetaSpace Gaming (MSPACE) Logo"
@@ -61,7 +61,7 @@ export default function Home() {
           {/* Show ReferralBox with Connect Wallet button */}
           <ReferralBox onConnect={connectWallet} />
 
-          <div className="h-10 mt-32 flex text-2xl text-accent2 w-full justify-center space-x-5">
+          {/* <div className="h-10 mt-32 flex text-2xl text-accent2 w-full justify-center space-x-5">
             <Social
               icon={faTwitter}
               link={"https://twitter.com/MetaspaceGaming"}
@@ -78,7 +78,7 @@ export default function Home() {
               name="MetaSpace Website Link"
               smol={true}
             />
-          </div>
+          </div> */}
         </div>
       </div>
     );
