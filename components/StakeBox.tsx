@@ -50,8 +50,8 @@ export default function StakeBox({ id }: StakeBoxProps) {
       </div>
       <div className="p-4">
         <div className="flex justify-center mb-4">
-          <div className="bg-accent rounded-full p-4">
-            <Image src={iconSrc} alt={title} width={48} height={48} />
+          <div className="bg-accent rounded-full">
+            <Image src={iconSrc} alt={title} width={121} height={121} />
           </div>
         </div>
         <div className="flex justify-between mb-2">

@@ -22,7 +22,7 @@ const fetchDataFromBlockchain = async (): Promise<StakeBoxData[]> => {
     {
       id: "mcdonalds-cashier",
       title: "McDonalds Cashier",
-      iconSrc: "/icons/cashier.png",
+      iconSrc: "/assets/jobs/cashier.svg",
       apr: 29.99,
       timeToUnlock: "next 3 days",
       amountLocked: 200.0,
@@ -31,7 +31,7 @@ const fetchDataFromBlockchain = async (): Promise<StakeBoxData[]> => {
     {
       id: "burger-flipper",
       title: "Burger Flipper",
-      iconSrc: "/icons/burger.png",
+      iconSrc: "/assets/jobs/flipper.svg",
       apr: 89.99,
       timeToUnlock: "next 3 days",
       amountLocked: 200.0,
@@ -40,7 +40,7 @@ const fetchDataFromBlockchain = async (): Promise<StakeBoxData[]> => {
     {
       id: "assistant-manager",
       title: "Assistant Manager",
-      iconSrc: "/icons/assistant-manager.png",
+      iconSrc: "/assets/jobs/assistant.svg",
       apr: 159.99,
       timeToUnlock: "next 3 days",
       amountLocked: 200.0,
@@ -49,7 +49,7 @@ const fetchDataFromBlockchain = async (): Promise<StakeBoxData[]> => {
     {
       id: "manager",
       title: "Manager",
-      iconSrc: "/icons/manager.png",
+      iconSrc: "/assets/jobs/manager.svg",
       apr: 242.99,
       timeToUnlock: "next 3 days",
       amountLocked: 200.0,
@@ -58,7 +58,7 @@ const fetchDataFromBlockchain = async (): Promise<StakeBoxData[]> => {
     {
       id: "the-inbred",
       title: "The Inbred",
-      iconSrc: "/icons/inbred.png",
+      iconSrc: "/assets/jobs/inbred.svg",
       apr: 420.69,
       timeToUnlock: "next 3 days",
       amountLocked: 200.0,
