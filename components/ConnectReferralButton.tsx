@@ -1,75 +1,40 @@
 import { useState } from "react";
 import Button from "../components/Button";
-import { useReferralStore } from "../store/referralStore"; // Import the Zustand store
+import { useReferralStore } from "../store/referralStore";
 import handleConnect from "../utils/handleConnect";
-import ReferralModal from "./ReferralModal"; // Adjust the path to the modal
+import ReferralModal from "./ReferralModal"; // Import the new ReferralModal
 
 export default function ConnectReferralButton() {
   const {
     connectedAddress,
     setConnectedAddress,
-    telegramUsername,
-    referrerUsername,
-    setTelegramUsername,
-    setReferrerUsername,
   } = useReferralStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Check if all fields are valid (wallet connected, tg username, referrer)
-  const isFormValid = connectedAddress && telegramUsername && referrerUsername;
 
   const handleConnectButton = async () => {
-    await handleConnect(setConnectedAddress);
-    setIsModalOpen(true); // Show the modal once wallet is connected
-  };
-
-  const handleModalSubmit = (tgUsername: string, refUsername: string) => {
-    if (tgUsername && refUsername) {
-      setTelegramUsername(tgUsername);
-      setReferrerUsername(refUsername);
-      setIsModalOpen(false); // Close modal only if form is valid
+    if (!connectedAddress) {
+      await handleConnect(setConnectedAddress);
     }
+    setIsModalOpen(true); // Open the modal after connecting or if already connected
   };
 
   return (
     <>
       {/* Connect Button Logic */}
       <Button
-        onClick={() => {
-          if (!connectedAddress || !isFormValid) {
-            handleConnectButton();
-          }
-        }}
+        onClick={handleConnectButton}
         className="absolute top-3 right-5"
       >
-        {isFormValid ? "Connected" : "Connect Wallet"}
+        {connectedAddress ? "Open Referral" : "Connect Wallet"}
       </Button>
 
       {/* Referral Modal */}
-      {isModalOpen && (
-        <ReferralModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          connectedAddress={connectedAddress}
-          onSubmit={handleModalSubmit}
-        />
-      )}
-
-      {/* Display Referral Info */}
-      <div className="mt-5 text-gray-700">
-        <p>
-          <strong>Wallet Address:</strong> {connectedAddress || "Not connected"}
-        </p>
-        <p>
-          <strong>Your Telegram Username:</strong>{" "}
-          {telegramUsername || "Not set"}
-        </p>
-        <p>
-          <strong>Referrer Username:</strong> {referrerUsername || "Not set"}
-        </p>
-      </div>
+      <ReferralModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConnect={() => handleConnect(setConnectedAddress)}
+      />
     </>
   );
 }

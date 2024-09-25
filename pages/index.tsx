@@ -1,13 +1,56 @@
-import { faTelegramPlane, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import Head from "next/head";
 import { useEffect, useState } from "react";
-import ReferralBox from "../components/ReferralBox";
-import ReferredBox from "../components/ReferredBox"; // Import ReferredBox
-import Social from "../components/Social";
+import ActionButton from "../components/AdminReferralsPanel/ActionButton";
+import AboutUs from "../components/sections/AboutUs";
+import Socials from "../components/sections/Socials";
+import Tokenomics from "../components/sections/Tokenomics";
+import StakeBox from "../components/StakeBox";
+import TopInfoBox from "../components/TopInfoBox";
 import { useConnectAddress } from "../hooks/useConnectedAddress"; // New Hook
+import { useStakeBoxStore } from "../store/stakeBoxStore";
+
+function Navbar() {
+  const { connectedAddress, connectWallet } = useConnectAddress();
+  return (
+    <nav className="bg-accent h-[154px] px-[142px] py-[26px] flex items-center justify-between">
+      <img
+        src="/logo-small.png"
+        alt="MetaSpace Gaming (MSPACE) Logo"
+        className="w-[188px]"
+      />
+      <div className="flex space-x-6 items-center">
+        <a href="#tokenomics" className="text-accent2 text-xl hover:underline">
+          Tokenomics
+        </a>
+        <a href="#about" className="text-accent2 text-xl hover:underline">
+          About
+        </a>
+        <a href="#roadmap" className="text-accent2 text-xl hover:underline">
+          Roadmap
+        </a>
+        {!connectedAddress && (
+          <ActionButton
+            label="Connect Wallet"
+            onClick={connectWallet}
+            color="bg-purple-500"
+          />
+        )}
+        {connectedAddress && (
+          <ActionButton
+            label={
+              connectedAddress.slice(0, 6) + "..." + connectedAddress.slice(-4)
+            }
+            onClick={() => {}}
+            color="bg-purple-500"
+          />
+        )}
+      </div>
+    </nav>
+  );
+}
 
 export default function Home() {
-  const { connectedAddress, connectWallet } = useConnectAddress(); // Using the custom hook
+  const { connectedAddress, connectWallet } = useConnectAddress();
+  const { fetchStakeBoxData } = useStakeBoxStore();
   const [hasReferralData, setHasReferralData] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -32,102 +75,24 @@ export default function Home() {
     if (connectedAddress) {
       checkReferralData(connectedAddress);
     }
+    fetchStakeBoxData();
   }, [connectedAddress]);
-
-  // If not connected, show referral box with the "Connect Wallet" button
-  if (!connectedAddress) {
-    return (
-      <div
-        className={
-          " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80 bg-mainbg font-body"
-        }
-      >
-        <Head>
-          <title>DASHBOARD | MCFARMERS</title>
-          <meta
-            name="viewport"
-            content="initial-scale=1.0, width=device-width"
-          />
-          {/* Other head elements */}
-        </Head>
-        <div className="h-full pb-32 w-full bg-accent rounded-xl shadow-lg px-5 pt-10 pb-4 flex flex-col items-center focus:border-red-500 relative">
-          <img
-            src="/McFarmers.png"
-            alt="MetaSpace Gaming (MSPACE) Logo"
-            className="w-64 xs:w-96 mt-10 mb-5"
-          />
-
-          {/* Show ReferralBox with Connect Wallet button */}
-          <ReferralBox onConnect={connectWallet} />
-          <div className="h-10 mt-28 flex text-2xl text-accent2 w-full justify-center space-x-5">
-            <Social
-              icon={faTwitter}
-              link={"https://twitter.com/mcfarmereth"}
-              name="MetaSpace Twitter Link"
-            />
-            <Social
-              icon={faTelegramPlane}
-              link={"https://t.me/McFarmers"}
-              name="MetaSpace Telegram Link"
-            />
-            {/* <Social
-              icon={faLink}
-              link={"https://metaspacemoon.com/"}
-              name="MetaSpace Website Link"
-              smol={true}
-            /> */}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div
-      className={
-        " min-h-screen py-3 px-3 xs:py-10 xs:px-10 xl:px-32 xlish:px-64 2xl:px-80 bg-mainbg font-body"
-      }
-    >
-      <Head>
-        <title>DASHBOARD | MCFARMERS</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        {/* Other head elements */}
-      </Head>
-      <div className="h-full w-full bg-accent rounded-xl shadow-lg px-5 pt-4 pb-4 flex flex-col items-center focus:border-red-500 relative">
-        <img
-          src="/McFarmers.png"
-          alt="MetaSpace Gaming (MSPACE) Logo"
-          className="w-64 xs:w-96"
-        />
-
-        {/* Show either ReferredBox or ReferralBox based on referral data */}
-        {loading ? (
-          <div>Loading...</div>
-        ) : hasReferralData ? (
-          <ReferredBox />
-        ) : (
-          <ReferralBox />
-        )}
-
-        <div className="h-10 mt-28 flex text-2xl text-accent2 w-full justify-center space-x-5">
-          <Social
-            icon={faTwitter}
-            link={"https://twitter.com/mcfarmereth"}
-            name="MetaSpace Twitter Link"
-          />
-          <Social
-            icon={faTelegramPlane}
-            link={"https://t.me/McFarmers"}
-            name="MetaSpace Telegram Link"
-          />
-          {/* <Social
-            icon={faLink}
-            link={"https://metaspacemoon.com/"}
-            name="MetaSpace Website Link"
-            smol={true}
-          /> */}
-        </div>
+    <div className="min-h-screen bg-mainbg font-body">
+      <Navbar />
+      <div className="flex justify-center mt-3">
+        <TopInfoBox />
       </div>
+      <div className="mt-12 flex mx-auto max-w-[1200px] justify-center gap-x-36 gap-y-12 flex-wrap text-white">
+        <StakeBox id="mcdonalds-cashier" />
+        <StakeBox id="burger-flipper" />
+        <StakeBox id="assistant-manager" />
+        <StakeBox id="manager" />
+        <StakeBox id="the-inbred" />
+      </div>
+      <AboutUs />
+      <Tokenomics />
+      <Socials />
     </div>
   );
 }
