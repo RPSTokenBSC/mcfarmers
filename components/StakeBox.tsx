@@ -12,7 +12,6 @@ export default function StakeBox({ id }: StakeBoxProps) {
   const [stakeDays, setStakeDays] = useState(4);
 
   if (!stakeBox) {
-    console.log("stakeBoxes", useStakeBoxStore.getState());
     return null; // or some loading state
   }
 

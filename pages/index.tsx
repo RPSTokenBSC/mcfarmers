@@ -17,22 +17,18 @@ function Navbar() {
         alt="MetaSpace Gaming (MSPACE) Logo"
         className="w-[188px]"
       />
-      <div className="flex space-x-6 items-center">
-        <a href="#tokenomics" className="text-accent2 text-xl hover:underline">
+      <div className="flex space-x-12 items-center">
+        <a href="#tokenomics" className="text-white text-3xl hover:underline">
           Tokenomics
         </a>
-        <a href="#about" className="text-accent2 text-xl hover:underline">
+        <a href="#about" className="text-white text-3xl hover:underline">
           About
         </a>
-        <a href="#roadmap" className="text-accent2 text-xl hover:underline">
+        <a href="#roadmap" className="text-white text-3xl hover:underline">
           Roadmap
         </a>
         {!connectedAddress && (
-          <ActionButton
-            label="Connect Wallet"
-            onClick={connectWallet}
-            color="bg-purple-500"
-          />
+          <ActionButton label="Connect Wallet" onClick={connectWallet} />
         )}
         {connectedAddress && (
           <ActionButton
@@ -40,7 +36,7 @@ function Navbar() {
               connectedAddress.slice(0, 6) + "..." + connectedAddress.slice(-4)
             }
             onClick={() => {}}
-            color="bg-purple-500"
+            // color="bg-purple-500"
           />
         )}
       </div>

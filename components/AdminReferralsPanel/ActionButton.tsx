@@ -1,19 +1,13 @@
 interface ActionButtonProps {
   label: string;
   onClick: () => void;
-  color: string; // E.g. "bg-blue-500", "bg-green-500", etc.
   className?: string;
 }
 
-const ActionButton = ({
-  label,
-  onClick,
-  color,
-  className,
-}: ActionButtonProps) => (
+const ActionButton = ({ label, onClick, className }: ActionButtonProps) => (
   <button
     onClick={onClick}
-    className={`${color} text-white px-4 py-1 rounded ${className}`}
+    className={`text-black leading-normal  text-3xl border-black border-2 rounded-3xl bg-accent2 py-[10px] px-[26px] ${className}`}
   >
     {label}
   </button>
